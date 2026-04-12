@@ -1,3 +1,7 @@
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+
 // ===== STAR BACKGROUND =====
 const starCanvas = document.querySelector("#stars");
 const ctx = starCanvas.getContext("2d");
@@ -6,12 +10,11 @@ starCanvas.width = window.innerWidth;
 starCanvas.height = window.innerHeight;
 
 starCanvas.style.position = "fixed";
-starCanvas.style.top = "0";
-starCanvas.style.left = "0";
-starCanvas.style.zIndex = "-1";
+starCanvas.style.top = 0;
+starCanvas.style.left = 0;
+starCanvas.style.zIndex = -1;
 
 let stars = [];
-
 for (let i = 0; i < 200; i++) {
     stars.push({
         x: Math.random() * starCanvas.width,
@@ -37,15 +40,10 @@ function animateStars() {
 
     requestAnimationFrame(animateStars);
 }
-
 animateStars();
 
 
 // ===== THREE.JS =====
-import * as THREE from "three";
-import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
-
 const canvas = document.querySelector("#three");
 
 const scene = new THREE.Scene();
@@ -64,10 +62,13 @@ const renderer = new THREE.WebGLRenderer({
     alpha: true
 });
 
+
 renderer.setSize(window.innerWidth, window.innerHeight);
 
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
+controls.enablePan = false;
+controls.enableZoom = true;
 
 // lights
 scene.add(new THREE.AmbientLight(0xffffff, 2));
@@ -77,13 +78,16 @@ light.position.set(5, 5, 5);
 scene.add(light);
 
 
-// model
+// ===== MODEL =====
 const loader = new GLTFLoader();
+
+let model = null;
+let exploded = false;
 
 loader.load(
     "./image/earth.glb",
     (gltf) => {
-        const model = gltf.scene;
+        model = gltf.scene;
 
         model.scale.set(0.1, 0.1, 0.1);
 
@@ -94,58 +98,29 @@ loader.load(
         scene.add(model);
 
         console.log("MODEL LOADED");
-    },
-    undefined,
     (err) => {
-        console.error("GLB LOAD ERROR:", err);
     }
 );
 
+
+// ===== INTERACTION =====
+window.addEventListener("mousemove", () => {
+    if (model && !exploded) {
+        model.scale.set(0.11, 0.11, 0.11);
+    }
+});
+
+
+// ===== ANIMATE (ONLY ONE LOOP) =====
 function animate() {
     requestAnimationFrame(animate);
 
-    controls.update();
-    renderer.render(scene, camera);
-}
+    if (model && !exploded) {
+        model.rotation.y += 0.002;
+    }
 
-animate();
-
-let hover = false;
-
-window.addEventListener("mousemove", (e) => {
-    hover = true;
-    earth.scale.set(1.05, 1.05, 1.05);
-});
-
-window.addEventListener("mouseleave", () => {
-    hover = false;
-    earth.scale.set(1, 1, 1);
-});
-
-let exploded = false;
-
-window.addEventListener("click", () => {
-    exploded = true;
-
-
-    earth.scale.set(2.5, 2.5, 2.5);
-
-    earth.rotation.x += 1;
-    earth.rotation.y += 1;
-
-
-    document.querySelector("#menu").style.display = "flex";
-});
-function animate() {
-    requestAnimationFrame(animate);
-
-    earth.rotation.y += 0.002;
-
-    if (exploded) {
-        earth.scale.x *= 0.98;
-        earth.scale.y *= 0.98;
-        earth.scale.z *= 0.98;
-
+    if (model && exploded) {
+        model.scale.multiplyScalar(0.98);
         camera.position.z *= 0.99;
     }
 
@@ -155,10 +130,29 @@ function animate() {
 
 animate();
 
-setTimeout(() => {
-    const menu = document.querySelector("#menu");
-    menu.style.display = "flex";
+
+renderer.domElement.addEventListener("pointerdown", () => {
+
+    if (!model) return;
+
+    exploded = true;
+    //  stagger animation
+    const menu = document.getElementById("menu");
+    menu.classList.add("show");
+    document.body.classList.add("menu-open");
+
+    menu.classList.add("show");
+    document.body.classList.add("menu-open");
+
+    const items = menu.querySelectorAll("a");
+
+
     setTimeout(() => {
-        menu.style.opacity = 1;
-    }, 100);
-}, 1000);
+        items.forEach((item, i) => {
+            setTimeout(() => {
+                item.style.opacity = "1";
+                item.style.transform = "translateY(0)";
+            }, i * 100);
+        });
+    }, 2000);
+});
