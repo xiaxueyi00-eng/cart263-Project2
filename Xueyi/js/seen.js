@@ -147,7 +147,7 @@ function placeBugs() {
                 (Math.random() - 0.5) * 4
             );
 
-            // ✅ FIX: 给 target（你原本缺的 bug）
+
             model.userData.target = new THREE.Vector3(
                 (Math.random() - 0.5) * 8,
                 model.position.y,
