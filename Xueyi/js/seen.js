@@ -10,7 +10,50 @@ document.body.style.overflow = "hidden";
 document.body.style.background = "black";
 
 /* =========================
-   DOM OVERLAY (SPOTLIGHT + TEXT)
+   EXIT
+========================= */
+
+let exit = document.createElement("div");
+exit.innerText = "EXIT";
+exit.style.position = "fixed";
+exit.style.left = "70%";
+exit.style.top = "60%";
+exit.style.color = "white";
+exit.style.fontFamily = "monospace";
+exit.style.fontSize = "20px";
+exit.style.opacity = "0";
+exit.style.cursor = "pointer";
+exit.style.transition = "0.3s";
+document.body.appendChild(exit);
+
+exit.addEventListener("click", () => {
+    window.location.href = "next.html";
+});
+
+/* =========================
+   UI BAR
+========================= */
+
+let bar = document.createElement("div");
+bar.style.position = "fixed";
+bar.style.left = "50%";
+bar.style.top = "20px";
+bar.style.transform = "translateX(-50%)";
+bar.style.width = "400px";
+bar.style.height = "6px";
+bar.style.background = "white";
+bar.style.boxShadow = "0 0 15px rgba(255,0,0,0.2)";
+document.body.appendChild(bar);
+
+let eat = document.createElement("div");
+eat.style.height = "100%";
+eat.style.width = "0%";
+eat.style.background = "#ff0000";
+eat.style.boxShadow = "0 0 10px red";
+bar.appendChild(eat);
+
+/* =========================
+   SPOTLIGHT
 ========================= */
 
 let spotlight = document.createElement("div");
@@ -21,30 +64,15 @@ spotlight.style.borderRadius = "50%";
 spotlight.style.pointerEvents = "none";
 spotlight.style.boxShadow =
     "0 0 70px rgba(255,255,255,0.35), 0 0 0 2500px rgba(0,0,0,0.95)";
-spotlight.style.transition = "left 0.05s, top 0.05s";
 spotlight.style.zIndex = "10";
 document.body.appendChild(spotlight);
 
-let secretText = document.createElement("div");
-secretText.innerText = "YOU ARE NOT INVISIBLE";
-secretText.style.position = "fixed";
-secretText.style.left = "50%";
-secretText.style.top = "50%";
-secretText.style.transform = "translate(-50%, -50%)";
-secretText.style.fontFamily = "monospace";
-secretText.style.fontSize = "24px";
-secretText.style.letterSpacing = "6px";
-secretText.style.color = "white";
-secretText.style.opacity = "0";
-secretText.style.transition = "opacity 0.4s ease";
-secretText.style.zIndex = "2";
-document.body.appendChild(secretText);
-
 /* =========================
-   THREE.JS SETUP
+   THREE SETUP
 ========================= */
 
 const scene = new THREE.Scene();
+scene.fog = new THREE.Fog(0x000000, 2, 12);
 
 const camera = new THREE.PerspectiveCamera(
     75,
@@ -56,18 +84,22 @@ camera.position.z = 5;
 
 const renderer = new THREE.WebGLRenderer({ alpha: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(window.devicePixelRatio);
+renderer.outputColorSpace = THREE.SRGBColorSpace;
 document.body.appendChild(renderer.domElement);
 
 /* LIGHT */
-const light = new THREE.AmbientLight(0xffffff, 1);
-scene.add(light);
+const dirLight = new THREE.DirectionalLight(0xffffff, 1);
+dirLight.position.set(3, 5, 5);
+scene.add(dirLight);
+
+scene.add(new THREE.AmbientLight(0x222222));
 
 /* =========================
-   GLB LOADER (BUGS)
+   BUGS
 ========================= */
 
 const loader = new GLTFLoader();
-
 let bugs = [];
 
 let bugModels = [
@@ -79,151 +111,127 @@ let bugModels = [
     "../image/bug5.glb",
     "../image/bug6.glb",
     "../image/bug7.glb",
-
+    "../image/bug8.glb",
+    "../image/bug9.glb",
+    "../image/bug10.glb",
+    "../image/bug11.glb",
+    "../image/bug12.glb",
+    "../image/bug13.glb",
+    "../image/bug14.glb",
 ];
 
 function placeBugs() {
-
     bugs.forEach(b => scene.remove(b));
     bugs = [];
 
-    let cols = 3;
-
-    bugModels.forEach((src, i) => {
-
+    bugModels.forEach((src) => {
         loader.load(src, (gltf) => {
+            const model = gltf.scene;
 
-            let model = gltf.scene;
+            model.traverse((child) => {
+                if (child.isMesh) {
+                    child.material = new THREE.MeshStandardMaterial({
+                        color: 0xffffff,
+                        roughness: 0.5,
+                        metalness: 0.1,
+                    });
+                }
+            });
 
-            let col = i % cols;
-            let row = Math.floor(i / cols);
+            let s = 0.25 + Math.random() * 0.25;
+            model.scale.setScalar(s);
 
-            model.position.x = (col - 1) * 2.2;
-            model.position.y = (1 - row) * 2.2;
-            model.position.z = 0;
+            model.position.set(
+                (Math.random() - 0.5) * 8,
+                (Math.random() - 0.5) * 6,
+                (Math.random() - 0.5) * 4
+            );
 
-            model.scale.set(0.6, 0.6, 0.6);
+            // ✅ FIX: 给 target（你原本缺的 bug）
+            model.userData.target = new THREE.Vector3(
+                (Math.random() - 0.5) * 8,
+                model.position.y,
+                (Math.random() - 0.5) * 4
+            );
 
             scene.add(model);
             bugs.push(model);
         });
-
     });
 }
 
 placeBugs();
-window.addEventListener("resize", placeBugs);
 
 /* =========================
-   MOUSE INTERACTION
+   MOUSE
 ========================= */
 
-let hoverTimer = null;
-let hovering = false;
+let mouseX = 0;
+let mouseY = 0;
 
 document.addEventListener("mousemove", (e) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
 
-    /* spotlight follow */
-    spotlight.style.left = (e.clientX - 160) + "px";
-    spotlight.style.top = (e.clientY - 160) + "px";
+    spotlight.style.left = (mouseX - 160) + "px";
+    spotlight.style.top = (mouseY - 160) + "px";
+});
 
-    /* center reveal */
-    let cx = window.innerWidth / 2;
-    let cy = window.innerHeight / 2;
+/* =========================
+   GAME STATE
+========================= */
 
-    let dx = e.clientX - cx;
-    let dy = e.clientY - cy;
+let eatPower = 0;
+let exitTimer = 0;
+let exitReady = false;
 
-    let distCenter = Math.sqrt(dx * dx + dy * dy);
+/* =========================
+   ANIMATE
+========================= */
 
-    if (distCenter < 140) {
+function animate() {
+    requestAnimationFrame(animate);
 
-        secretText.style.opacity = "1";
-
-        if (!hovering) {
-            hovering = true;
-
-            hoverTimer = setTimeout(() => {
-                window.location.href = "../weini/document.html";
-            }, 3000);
-        }
-
-    } else {
-
-        secretText.style.opacity = "0";
-        hovering = false;
-
-        if (hoverTimer) {
-            clearTimeout(hoverTimer);
-            hoverTimer = null;
-        }
-    }
-
-    /* =========================
-       3D REVEAL (BUGS)
-    ========================= */
-
-    let mouse = new THREE.Vector2(
-        (e.clientX / window.innerWidth) * 2 - 1,
-        -(e.clientY / window.innerHeight) * 2 + 1
-    );
+    let danger = 0;
 
     bugs.forEach((b) => {
+        if (!b.userData.target) return;
 
-        let dx = mouse.x - b.position.x * 0.2;
-        let dy = mouse.y - b.position.y * 0.2;
+        b.position.x += (b.userData.target.x - b.position.x) * 0.02;
+        b.position.z += (b.userData.target.z - b.position.z) * 0.02;
 
-        let d = Math.sqrt(dx * dx + dy * dy);
+        let dx = b.position.x - (mouseX / window.innerWidth - 0.5) * 6;
+        let dz = b.position.z - (mouseY / window.innerHeight - 0.5) * 6;
 
-        if (d < 0.6) {
-            b.visible = true;
-            b.scale.set(0.7, 0.7, 0.7);
-        } else {
-            b.visible = false;
-        }
+        let dist = Math.sqrt(dx * dx + dz * dz);
+
+        if (dist < 1) danger++;
     });
 
-});
+    eatPower += danger * 0.01;
+    eatPower = Math.max(0, Math.min(1, eatPower));
 
-/* =========================
-   KEYBOARD NAV
-========================= */
+    eat.style.width = (eatPower * 100) + "%";
+    eat.style.background = `rgb(255, ${255 - eatPower * 255}, 0)`;
 
-window.addEventListener("keydown", (e) => {
-    if (e.key === "ArrowRight") {
-        window.location.href = "../weini/document.html";
+    renderer.render(scene, camera);
+
+    /* EXIT LOGIC */
+    if (eatPower > 0.6) {
+        exitTimer++;
+        if (exitTimer > 120) exitReady = true;
+    } else {
+        exitTimer = 0;
+        exitReady = false;
     }
-});
 
-/* =========================
-   ANIMATION LOOP
-========================= */
-
-function animate() {
-    requestAnimationFrame(animate);
-    renderer.render(scene, camera);
+    if (exitReady) {
+        exit.style.opacity = "1";
+        exit.style.transform = "scale(1.2)";
+    } else {
+        exit.style.opacity = "0";
+        exit.style.transform = "scale(1)";
+    }
 }
 
-function animate() {
-    requestAnimationFrame(animate);
-
-    let time = Date.now() * 0.001;
-
-    bugs.forEach((b, i) => {
-
-
-        let speed = 0.002;
-
-        b.position.x += Math.sin(time + i * 10) * speed;
-        b.position.z += Math.cos(time + i * 8) * speed;
-
-
-        b.position.y += Math.sin(time * 2 + i) * 0.0015;
-
-        b.rotation.y += 0.01;
-    });
-
-    renderer.render(scene, camera);
-}
 animate();
-
