@@ -43,18 +43,13 @@ function animateStars() {
 animateStars();
 
 
-// ===== THREE.JS =====
-const canvas = document.querySelector("#three");
-
+// ===== SCENE =====
 const scene = new THREE.Scene();
 
-const camera = new THREE.PerspectiveCamera(
-    75,
-    window.innerWidth / window.innerHeight,
-    0.1,
-    1000
-);
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.position.set(0, 0, 3);
+
+const canvas = document.querySelector("#three");
 
 const renderer = new THREE.WebGLRenderer({
     canvas,
@@ -62,13 +57,12 @@ const renderer = new THREE.WebGLRenderer({
     alpha: true
 });
 
-
 renderer.setSize(window.innerWidth, window.innerHeight);
 
+// controls
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.enablePan = false;
-controls.enableZoom = true;
 
 // lights
 scene.add(new THREE.AmbientLight(0xffffff, 2));
@@ -77,15 +71,14 @@ const light = new THREE.DirectionalLight(0xffffff, 2);
 light.position.set(5, 5, 5);
 scene.add(light);
 
-
-// ===== MODEL =====
+// ===== MODEL (ONLY ONCE) =====
 const loader = new GLTFLoader();
 
 let model = null;
 let exploded = false;
 
 loader.load(
-    "./image/earth.glb",
+    "../image/earth.glb",
     (gltf) => {
         model = gltf.scene;
 
@@ -96,12 +89,8 @@ loader.load(
         model.position.sub(center);
 
         scene.add(model);
-
-        console.log("MODEL LOADED");
-    (err) => {
     }
 );
-
 
 // ===== INTERACTION =====
 window.addEventListener("mousemove", () => {
@@ -110,8 +99,7 @@ window.addEventListener("mousemove", () => {
     }
 });
 
-
-// ===== ANIMATE (ONLY ONE LOOP) =====
+// ===== ANIMATE =====
 function animate() {
     requestAnimationFrame(animate);
 
@@ -130,22 +118,17 @@ function animate() {
 
 animate();
 
-
+// ===== CLICK =====
 renderer.domElement.addEventListener("pointerdown", () => {
-
     if (!model) return;
 
     exploded = true;
-    //  stagger animation
+
     const menu = document.getElementById("menu");
     menu.classList.add("show");
     document.body.classList.add("menu-open");
 
-    menu.classList.add("show");
-    document.body.classList.add("menu-open");
-
     const items = menu.querySelectorAll("a");
-
 
     setTimeout(() => {
         items.forEach((item, i) => {
