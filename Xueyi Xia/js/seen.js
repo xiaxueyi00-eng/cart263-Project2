@@ -28,11 +28,10 @@ story.style.transition = "1s";
 document.body.appendChild(story);
 
 let lines = [
-    "Welcome to the depths of the network",
-    "Something is watching",
-    "You are not alone",
-    "Move carefully",
-    "Find the key... before it finds you"
+    "YOU HAVE ENTERED THE SYSTEM",
+    "YOUR MOVEMENTS ARE BEING TRACKED",
+    "YOU ARE NOT IN CONTROL",
+    "ESCAPE IF YOU CAN"
 ];
 
 let i = 0;
@@ -225,6 +224,8 @@ document.body.appendChild(timer);
 function animate() {
     requestAnimationFrame(animate);
 
+    camera.rotation.z = Math.sin(Date.now() * 0.001) * 0.01;
+
     let elapsedTime = (Date.now() - gameStart) / 1000;
 
     if (elapsedTime > timeLimit && !restartTriggered) {
@@ -293,7 +294,13 @@ function animate() {
             let dist = Math.sqrt(dx * dx + dz * dz);
 
             if (dist < 0.8) {
-                window.location.href = "next.html";
+
+                story.innerText = "ESCAPE DETECTED";
+                story.style.opacity = "1";
+
+                setTimeout(() => {
+                    window.location.href = "next.html";
+                }, 1200);
             }
 
         } else {
