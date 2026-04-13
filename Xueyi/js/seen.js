@@ -9,26 +9,73 @@ document.body.style.margin = "0";
 document.body.style.overflow = "hidden";
 document.body.style.background = "black";
 
+
+/* =========================
+   STORY TEXT
+========================= */
+
+let story = document.createElement("div");
+story.style.position = "fixed";
+story.style.top = "40%";
+story.style.left = "50%";
+story.style.transform = "translate(-50%, -50%)";
+story.style.color = "white";
+story.style.fontFamily = "monospace";
+story.style.fontSize = "22px";
+story.style.textAlign = "center";
+story.style.opacity = "0";
+story.style.transition = "1s";
+document.body.appendChild(story);
+
+let lines = [
+    "Welcome to the depths of the network",
+    "Something is watching",
+    "You are not alone",
+    "Move carefully",
+    "Find the key... before it finds you"
+];
+
+let i = 0;
+
+function showStory() {
+    if (i >= lines.length) {
+        story.style.opacity = "0";
+        return;
+    }
+
+    story.innerText = lines[i];
+    story.style.opacity = "1";
+
+    setTimeout(() => {
+        story.style.opacity = "0";
+        i++;
+        setTimeout(showStory, 1200);
+    }, 2000);
+}
+
+setTimeout(showStory, 1000);
+
 /* =========================
    EXIT
 ========================= */
 
-let exit = document.createElement("div");
-exit.innerText = "EXIT";
-exit.style.position = "fixed";
-exit.style.left = "70%";
-exit.style.top = "60%";
-exit.style.color = "white";
-exit.style.fontFamily = "monospace";
-exit.style.fontSize = "20px";
-exit.style.opacity = "0";
-exit.style.cursor = "pointer";
-exit.style.transition = "0.3s";
-document.body.appendChild(exit);
+// let exit = document.createElement("div");
+// exit.innerText = "EXIT";
+// exit.style.position = "fixed";
+// exit.style.left = "70%";
+// exit.style.top = "60%";
+// exit.style.color = "white";
+// exit.style.fontFamily = "monospace";
+// exit.style.fontSize = "20px";
+// exit.style.opacity = "0";
+// exit.style.cursor = "pointer";
+// exit.style.transition = "0.3s";
+// document.body.appendChild(exit);
 
-exit.addEventListener("click", () => {
-    window.location.href = "next.html";
-});
+// exit.addEventListener("click", () => {
+//     window.location.href = "next.html";
+// });
+
 
 /* =========================
    UI BAR
@@ -74,6 +121,21 @@ document.body.appendChild(spotlight);
 const scene = new THREE.Scene();
 scene.fog = new THREE.Fog(0x000000, 2, 12);
 
+const loader = new GLTFLoader();
+
+let key;
+
+loader.load("../image/key.glb", (gltf) => {
+    key = gltf.scene;
+
+    key.scale.set(0.5, 0.5, 0.5);
+    key.position.set(0, 0, -2);
+
+    key.visible = false;
+
+    scene.add(key);
+});
+
 const camera = new THREE.PerspectiveCamera(
     75,
     window.innerWidth / window.innerHeight,
@@ -99,7 +161,6 @@ scene.add(new THREE.AmbientLight(0x222222));
    BUGS
 ========================= */
 
-const loader = new GLTFLoader();
 let bugs = [];
 
 let bugModels = [
@@ -182,8 +243,7 @@ document.addEventListener("mousemove", (e) => {
 ========================= */
 
 let eatPower = 0;
-let exitTimer = 0;
-let exitReady = false;
+
 
 /* =========================
    ANIMATE
@@ -194,6 +254,7 @@ function animate() {
 
     let danger = 0;
 
+    //  BUG movement
     bugs.forEach((b) => {
         if (!b.userData.target) return;
 
@@ -208,30 +269,47 @@ function animate() {
         if (dist < 1) danger++;
     });
 
+    //  UI bar
     eatPower += danger * 0.01;
     eatPower = Math.max(0, Math.min(1, eatPower));
 
     eat.style.width = (eatPower * 100) + "%";
     eat.style.background = `rgb(255, ${255 - eatPower * 255}, 0)`;
 
+    // key movement
+    if (key) {
+
+        let elapsed = (Date.now() - startTime) / 1000; // 秒
+
+        if (elapsed > 10 && eatPower > 0.6) {
+
+            key.visible = true;
+
+
+            key.position.x = Math.sin(elapsed * 0.5) * 3;
+            key.position.z = Math.cos(elapsed * 0.5) * 2;
+            key.position.y = Math.sin(elapsed * 1.5) * 0.8;
+
+
+            key.rotation.y += 0.03;
+
+            let dx = key.position.x - (mouseX / window.innerWidth - 0.5) * 6;
+            let dz = key.position.z - (mouseY / window.innerHeight - 0.5) * 6;
+
+            let dist = Math.sqrt(dx * dx + dz * dz);
+
+            if (dist < 0.8) {
+                window.location.href = "next.html";
+            }
+
+        } else {
+            key.visible = false;
+        }
+    }
+
+
     renderer.render(scene, camera);
-
-    /* EXIT LOGIC */
-    if (eatPower > 0.6) {
-        exitTimer++;
-        if (exitTimer > 120) exitReady = true;
-    } else {
-        exitTimer = 0;
-        exitReady = false;
-    }
-
-    if (exitReady) {
-        exit.style.opacity = "1";
-        exit.style.transform = "scale(1.2)";
-    } else {
-        exit.style.opacity = "0";
-        exit.style.transform = "scale(1)";
-    }
 }
 
 animate();
+
