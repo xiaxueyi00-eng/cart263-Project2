@@ -22,7 +22,6 @@ renderer.setPixelRatio(window.devicePixelRatio);
 const controls = new OrbitControls(camera, canvas);
 controls.enableDamping = true;
 
-
 const mainC = new THREE.Mesh(
     new THREE.SphereGeometry(0.3, 64, 64),
     new THREE.MeshStandardMaterial({
@@ -77,6 +76,7 @@ scene.add(nodeGroup);
 
 const nodes = [];
 const lines = [];
+const dataFlows = [];
 
 const nodeCount = 35;
 
@@ -105,7 +105,10 @@ for (let i = 0; i < nodeCount; i++) {
     node.userData = {
         baseY: node.position.y,
         offset: Math.random() * Math.PI * 2,
-        speed: 0.5 + Math.random() * 1
+        speed: 0.5 + Math.random() * 1,
+        isAbsorbing: false,
+        isHovered: false,
+        isSelected: false
     };
 
     nodeGroup.add(node);
@@ -128,6 +131,21 @@ for (let i = 0; i < nodeCount; i++) {
 
     scene.add(line);
     lines.push(line);
+
+    const flow = new THREE.Mesh(
+        new THREE.SphereGeometry(0.01, 8, 8),
+        new THREE.MeshBasicMaterial({
+            color: '#f4fbff'
+        })
+    );
+
+    flow.userData = {
+        progress: Math.random(),
+        speed: 0.003 + Math.random() * 0.004
+    };
+
+    scene.add(flow);
+    dataFlows.push(flow);
 }
 
 const clock = new THREE.Clock();
@@ -139,19 +157,48 @@ const mouse = new THREE.Vector2();
 
 let hoveredNode = null;
 
+const inputOverlay = document.querySelector('#inputOverlay');
+const thoughtInput = document.querySelector('#thoughtInput');
+
+let selectedNode = null;
+
 window.addEventListener('mousemove', (event) => {
     mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
     mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 });
 
 window.addEventListener('click', () => {
-    if (hoveredNode) {
-        console.log('clicked node:', hoveredNode);
-        hoveredNode.material.emissiveIntensity = 2.5;
+    if (hoveredNode && !hoveredNode.userData.isAbsorbing) {
+        if (selectedNode && selectedNode !== hoveredNode) {
+            selectedNode.userData.isSelected = false;
+            selectedNode.material.color.set('#8fdfff');
+            selectedNode.material.emissive.set('#8fdfff');
+        }
 
-        setTimeout(() => {
-            hoveredNode.material.emissiveIntensity = 1.2;
-        }, 150);
+        selectedNode = hoveredNode;
+        selectedNode.userData.isSelected = true;
+
+        selectedNode.material.color.set('#fffc3f');
+        selectedNode.material.emissive.set('#fffc3f');
+        selectedNode.material.emissiveIntensity = 2.2;
+
+        inputOverlay.style.display = 'block';
+        thoughtInput.value = '';
+        thoughtInput.focus();
+    }
+});
+
+thoughtInput.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
+        const text = thoughtInput.value.trim();
+
+        if (!text || !selectedNode) return;
+
+        inputOverlay.style.display = 'none';
+        thoughtInput.value = '';
+
+        selectedNode.userData.isAbsorbing = true;
+        selectedNode.userData.isSelected = false;
     }
 });
 
@@ -169,9 +216,48 @@ function animate() {
         const node = nodes[i];
         const line = lines[i];
 
-        node.position.y =
-            node.userData.baseY +
-            Math.sin(elapsedTime * node.userData.speed + node.userData.offset) * 0.08;
+        if (!node.userData.isAbsorbing) {
+            node.position.y =
+                node.userData.baseY +
+                Math.sin(elapsedTime * node.userData.speed + node.userData.offset) * 0.08;
+        }
+
+        if (node.userData.isHovered && !node.userData.isSelected && !node.userData.isAbsorbing) {
+            node.scale.set(1.25, 1.25, 1.25);
+            node.material.emissiveIntensity = 1.2;
+        }
+        else if (node.userData.isSelected && !node.userData.isAbsorbing) {
+            node.scale.set(1.35, 1.35, 1.35);
+            node.material.emissiveIntensity = 2.2;
+        }
+        else if (!node.userData.isAbsorbing) {
+            node.scale.set(1, 1, 1);
+            node.material.emissiveIntensity = 0.6;
+        }
+
+        if (node.userData.isAbsorbing) {
+            node.position.lerp(new THREE.Vector3(0, 0, 0), 0.06);
+            node.scale.multiplyScalar(0.97);
+
+            node.material.emissiveIntensity = 2.5;
+            node.material.color.lerp(new THREE.Color('#ffffff'), 0.08);
+            node.material.emissive.lerp(new THREE.Color('#ffffff'), 0.08);
+
+            if (node.position.length() < 0.12 || node.scale.x < 0.05) {
+                node.visible = false;
+                line.visible = false;
+                node.userData.isAbsorbing = false;
+
+                if (selectedNode === node) {
+                    selectedNode = null;
+                }
+
+                mainC.scale.set(1.1, 1.1, 1.1);
+                setTimeout(() => {
+                    mainC.scale.set(1, 1, 1);
+                }, 120);
+            }
+        }
 
         node.getWorldPosition(tempNodeWorld);
         mainC.getWorldPosition(tempMainWorld);
@@ -187,21 +273,37 @@ function animate() {
         linePositions[5] = tempMainWorld.z;
 
         line.geometry.attributes.position.needsUpdate = true;
+
+        const flow = dataFlows[i];
+
+        flow.userData.progress += flow.userData.speed;
+
+        if (flow.userData.progress > 1) {
+            flow.userData.progress = 0;
+        }
+
+        const t = flow.userData.progress;
+
+        flow.position.x = tempNodeWorld.x + (tempMainWorld.x - tempNodeWorld.x) * t;
+        flow.position.y = tempNodeWorld.y + (tempMainWorld.y - tempNodeWorld.y) * t;
+        flow.position.z = tempNodeWorld.z + (tempMainWorld.z - tempNodeWorld.z) * t;
     }
 
     raycaster.setFromCamera(mouse, camera);
     const intersects = raycaster.intersectObjects(nodes);
 
-    if (hoveredNode) {
-        hoveredNode.scale.set(1, 1, 1);
-        hoveredNode.material.emissiveIntensity = 0.6;
-        hoveredNode = null;
+    for (let i = 0; i < nodes.length; i++) {
+        nodes[i].userData.isHovered = false;
     }
+
+    hoveredNode = null;
 
     if (intersects.length > 0) {
         hoveredNode = intersects[0].object;
-        hoveredNode.scale.set(1.4, 1.4, 1.4);
-        hoveredNode.material.emissiveIntensity = 2;
+
+        if (!hoveredNode.userData.isAbsorbing) {
+            hoveredNode.userData.isHovered = true;
+        }
     }
 
     controls.update();
