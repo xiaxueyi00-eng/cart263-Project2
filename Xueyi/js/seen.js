@@ -55,49 +55,7 @@ function showStory() {
 
 setTimeout(showStory, 1000);
 
-/* =========================
-   EXIT
-========================= */
 
-// let exit = document.createElement("div");
-// exit.innerText = "EXIT";
-// exit.style.position = "fixed";
-// exit.style.left = "70%";
-// exit.style.top = "60%";
-// exit.style.color = "white";
-// exit.style.fontFamily = "monospace";
-// exit.style.fontSize = "20px";
-// exit.style.opacity = "0";
-// exit.style.cursor = "pointer";
-// exit.style.transition = "0.3s";
-// document.body.appendChild(exit);
-
-// exit.addEventListener("click", () => {
-//     window.location.href = "next.html";
-// });
-
-
-// /* =========================
-//    UI BAR
-// ========================= */
-
-// let bar = document.createElement("div");
-// bar.style.position = "fixed";
-// bar.style.left = "50%";
-// bar.style.top = "20px";
-// bar.style.transform = "translateX(-50%)";
-// bar.style.width = "400px";
-// bar.style.height = "6px";
-// bar.style.background = "white";
-// bar.style.boxShadow = "0 0 15px rgba(255,0,0,0.2)";
-// document.body.appendChild(bar);
-
-// let eat = document.createElement("div");
-// eat.style.height = "100%";
-// eat.style.width = "0%";
-// eat.style.background = "#ff0000";
-// eat.style.boxShadow = "0 0 10px red";
-// bar.appendChild(eat);
 
 /* =========================
    SPOTLIGHT
@@ -306,8 +264,6 @@ function animate() {
     hp = Math.max(0, Math.min(1, hp));
     eatPower = Math.max(0, Math.min(1, eatPower));
 
-    // eat.style.width = (eatPower * 100) + "%";
-    // eat.style.background = `rgb(255, ${255 - eatPower * 255}, 0)`;
 
 
     let remaining = Math.max(0, timeLimit - elapsedTime);
