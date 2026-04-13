@@ -77,27 +77,27 @@ setTimeout(showStory, 1000);
 // });
 
 
-/* =========================
-   UI BAR
-========================= */
+// /* =========================
+//    UI BAR
+// ========================= */
 
-let bar = document.createElement("div");
-bar.style.position = "fixed";
-bar.style.left = "50%";
-bar.style.top = "20px";
-bar.style.transform = "translateX(-50%)";
-bar.style.width = "400px";
-bar.style.height = "6px";
-bar.style.background = "white";
-bar.style.boxShadow = "0 0 15px rgba(255,0,0,0.2)";
-document.body.appendChild(bar);
+// let bar = document.createElement("div");
+// bar.style.position = "fixed";
+// bar.style.left = "50%";
+// bar.style.top = "20px";
+// bar.style.transform = "translateX(-50%)";
+// bar.style.width = "400px";
+// bar.style.height = "6px";
+// bar.style.background = "white";
+// bar.style.boxShadow = "0 0 15px rgba(255,0,0,0.2)";
+// document.body.appendChild(bar);
 
-let eat = document.createElement("div");
-eat.style.height = "100%";
-eat.style.width = "0%";
-eat.style.background = "#ff0000";
-eat.style.boxShadow = "0 0 10px red";
-bar.appendChild(eat);
+// let eat = document.createElement("div");
+// eat.style.height = "100%";
+// eat.style.width = "0%";
+// eat.style.background = "#ff0000";
+// eat.style.boxShadow = "0 0 10px red";
+// bar.appendChild(eat);
 
 /* =========================
    SPOTLIGHT
@@ -243,7 +243,22 @@ document.addEventListener("mousemove", (e) => {
 ========================= */
 
 let eatPower = 0;
+let startTime = Date.now();
+let hp = 1;
+let timeLimit = 80;
+let gameStart = Date.now();
+let restartTriggered = false;
 
+let timer = document.createElement("div");
+timer.style.position = "fixed";
+timer.style.top = "50px";
+timer.style.left = "50%";
+timer.style.transform = "translateX(-50%)";
+timer.style.color = "white";
+timer.style.fontFamily = "Arial";
+timer.style.fontSize = "18px";
+timer.style.zIndex = "9999";
+document.body.appendChild(timer);
 
 /* =========================
    ANIMATE
@@ -251,6 +266,18 @@ let eatPower = 0;
 
 function animate() {
     requestAnimationFrame(animate);
+
+    let elapsedTime = (Date.now() - gameStart) / 1000;
+
+    if (elapsedTime > timeLimit && !restartTriggered) {
+        restartTriggered = true;
+
+
+        alert("Time's up! Restarting...");
+        window.location.reload();
+
+
+    }
 
     let danger = 0;
 
@@ -271,15 +298,26 @@ function animate() {
 
     //  UI bar
     eatPower += danger * 0.01;
+
+    if (eatPower > 0.6) {
+        hp -= danger * 0.005;
+    }
+
+    hp = Math.max(0, Math.min(1, hp));
     eatPower = Math.max(0, Math.min(1, eatPower));
 
-    eat.style.width = (eatPower * 100) + "%";
-    eat.style.background = `rgb(255, ${255 - eatPower * 255}, 0)`;
+    // eat.style.width = (eatPower * 100) + "%";
+    // eat.style.background = `rgb(255, ${255 - eatPower * 255}, 0)`;
 
+
+    let remaining = Math.max(0, timeLimit - elapsedTime);
+    if (Math.floor(remaining * 10) % 2 === 0) {
+        timer.innerText = "TIME LEFT: " + remaining.toFixed(1);
+    }
     // key movement
     if (key) {
 
-        let elapsed = (Date.now() - startTime) / 1000; // 秒
+        let elapsed = (Date.now() - startTime) / 3000;
 
         if (elapsed > 10 && eatPower > 0.6) {
 
