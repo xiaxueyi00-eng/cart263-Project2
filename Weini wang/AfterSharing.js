@@ -1,14 +1,23 @@
 const config = {
     type: Phaser.AUTO,
-    width: innerWidth,
-    height: innerHeight,
-    backgroundColor: "#111111",
+    width: 800,
+    height: 600,
+    parent: "game-container",
+    backgroundColor: "#d1d1d1",
+
+    scale: {
+        mode: Phaser.Scale.FIT,
+        autoCenter: Phaser.Scale.CENTER_BOTH
+    },
+
+    render: {
+        pixelArt: true
+    },
+
     physics: {
         default: "arcade",
-        arcade: {
-            debug: false
-        }
     },
+
     scene: {
         preload: preload,
         create: create,
@@ -26,13 +35,19 @@ function preload() {
         frameWidth: 16,
         frameHeight: 32
     });
+
+    this.load.image("frame", "image/background.png");
 }
 
 function create() {
 
+    const frame = this.add.image(400, 300, "frame");
+
     player = this.physics.add.sprite(100, 300, "player");
-    player.setScale(3);
-    player.setOrigin(0.5, 0.5);
+    player.setScale(2);
+
+    this.physics.world.setBounds(0, 0, 800, 600);
+    player.setCollideWorldBounds(true);
 
     this.anims.create({
         key: "walkDown",
@@ -55,9 +70,8 @@ function create() {
         repeat: -1
     });
 
-
-
     cursors = this.input.keyboard.createCursorKeys();
+
 }
 
 function update() {
@@ -68,21 +82,21 @@ function update() {
 
         player.anims.play("walkSide", true);
 
-        player.setFlipX(true); // 👈 向左翻转
+        player.setFlipX(true);
     }
     else if (cursors.right.isDown) {
         player.setVelocityX(120);
 
         player.anims.play("walkSide", true);
 
-        player.setFlipX(false); // 👈 正常（向右）
+        player.setFlipX(false);
     }
     else if (cursors.down.isDown) {
         player.setVelocityY(120);
 
         player.anims.play("walkDown", true);
 
-        player.setFlipX(false); // 防止残留翻转
+        player.setFlipX(false);
     }
     else if (cursors.up.isDown) {
         player.setVelocityY(-120);
