@@ -1,6 +1,33 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 
+
+
+
+// ===== TEXT (CENTER TITLE) =====
+
+
+const title = document.createElement("div");
+
+title.innerText = "INTERCONNECTED SYSTEM";
+
+title.style.position = "fixed";
+title.style.top = "50%";
+title.style.left = "50%";
+title.style.transform = "translate(-50%, -50%)";
+
+title.style.color = "white";
+title.style.fontFamily = "Helvetica, Arial, sans-serif";
+title.style.fontWeight = "100";
+title.style.letterSpacing = "8px";
+title.style.textTransform = "uppercase";
+title.style.opacity = "0.7";
+document.body.appendChild(title);
+
+
+setTimeout(() => {
+    title.style.opacity = "0.6";
+}, 500);
 /* =========================
    BASIC SETUP
 ========================= */
@@ -61,6 +88,9 @@ const ballCount = 58;
 let lines = [];
 
 
+
+
+
 loader.load("../image/ball.glb", (gltf) => {
 
     for (let i = 0; i < ballCount; i++) {
@@ -85,6 +115,13 @@ loader.load("../image/ball.glb", (gltf) => {
 
         scene.add(b);
         balls.push(b);
+
+        if (i !== 0) {
+            b.userData.info = {
+                title: "Ball " + i,
+                desc: "This is a simple node."
+            };
+        }
     }
 });
 
@@ -198,12 +235,10 @@ function animate() {
 
 animate();
 
-/* =========================
-   RESIZE
-========================= */
+window.addEventListener("pointerdown", (event) => {
 
-window.addEventListener("resize", () => {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
+    if (event.clientX > window.innerWidth / 2) {
+        window.location.href = "seen.html";
+    }
 });
+

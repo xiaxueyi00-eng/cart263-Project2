@@ -276,3 +276,9 @@ function animate() {
 
 animate();
 
+window.addEventListener("pointerdown", (event) => {
+
+    if (event.clientX > window.innerWidth / 2) {
+        // window.location.href = "seen.html";
+    }
+});
