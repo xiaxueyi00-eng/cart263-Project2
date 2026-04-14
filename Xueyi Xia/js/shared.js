@@ -1,12 +1,7 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 
-
-
-
 // ===== TEXT (CENTER TITLE) =====
-
-
 const title = document.createElement("div");
 
 title.innerText = "INTERCONNECTED SYSTEM";
@@ -75,6 +70,16 @@ let centerModel;
 
 loader.load("../image/human.glb", (gltf) => {
     centerModel = gltf.scene;
+
+    centerModel.traverse((child) => {
+        if (child.isMesh) {
+            child.material = new THREE.MeshStandardMaterial({
+                color: 0x4aa3ff,
+                roughness: 0.6,
+                metalness: 0.2
+            });
+        }
+    })
     centerModel.scale.set(1, 1, 1);
     scene.add(centerModel);
 });
@@ -235,10 +240,10 @@ function animate() {
 
 animate();
 
-window.addEventListener("pointerdown", (event) => {
+window.addEventListener("click", (event) => {
+    const isRight = event.clientX > window.innerWidth / 2;
 
-    if (event.clientX > window.innerWidth / 2) {
-        window.location.href = "seen.html";
-    }
+    if (!isRight) return;
+
+    window.location.href = "seen.html";
 });
-
