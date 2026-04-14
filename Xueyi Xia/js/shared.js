@@ -77,7 +77,7 @@ loader.load("../image/ball.glb", (gltf) => {
             (Math.random() - 0.5) * 10
         );
 
-        // 🧠 记录初始位置（用于漂浮）
+
         b.userData.base = b.position.clone();
         b.userData.offset = Math.random() * 100;
 
@@ -85,6 +85,7 @@ loader.load("../image/ball.glb", (gltf) => {
         balls.push(b);
     }
 });
+
 
 /* =========================
    LINES
@@ -128,10 +129,6 @@ document.addEventListener("mousemove", (e) => {
 function animate() {
     requestAnimationFrame(animate);
 
-    // if (centerModel) {
-    //     centerModel.position.x += (mouseX * 2 - centerModel.position.x) * 0.05;
-    //     centerModel.position.y += (-mouseY * 2 - centerModel.position.y) * 0.05;
-    // }
 
     if (centerModel && balls.length > 0) {
 
