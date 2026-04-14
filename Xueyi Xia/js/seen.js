@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 
+let STATE = "PLAYING";
 /* =========================
    BASIC SETUP
 ========================= */
@@ -209,7 +210,7 @@ document.addEventListener("mousemove", function (event) {
    GAME STATE
 ========================= */
 let startTime = Date.now();
-let timeLimit = 80;
+let timeLimit = 60;
 let restartTriggered = false;
 
 
@@ -254,9 +255,9 @@ function animate() {
     // key logic
     // =====================
 
-    if (key) {
+    if (STATE === "PLAYING" && key) {
 
-        let t = (Date.now() - startTime) / 3000;
+        let t = (Date.now() - startTime) / 2000;
 
         if (t > 10) {
 
@@ -268,7 +269,6 @@ function animate() {
 
             key.rotation.y += 0.03;
 
-
             let mx = (mouseX / window.innerWidth - 0.5) * 6;
             let mz = (mouseY / window.innerHeight - 0.5) * 6;
 
@@ -277,14 +277,19 @@ function animate() {
 
             let dist = dx * dx + dz * dz;
 
-
+            // =========================
+            // hover effect
+            // =========================
             if (dist < 3) {
-                key.scale.set(0.6, 0.6, 0.6); // 放大一点
-                key.material && (key.material.emissive = new THREE.Color(0xffffff));
+                key.scale.set(0.6, 0.6, 0.6);
             } else {
                 key.scale.set(0.5, 0.5, 0.5);
+                key._lockStart = null;
             }
 
+            // =========================
+            // hold to unlock
+            // =========================
             if (dist < 3) {
 
                 if (!key._lockStart) {
@@ -292,17 +297,18 @@ function animate() {
                 }
 
                 if (Date.now() - key._lockStart > 800) {
+
+                    STATE = "WIN";
+
                     window.location.href = "next.html";
                 }
-
-            } else {
-                key._lockStart = null;
             }
 
         } else {
             key.visible = false;
         }
     }
+
 
     renderer.render(scene, camera);
 }
