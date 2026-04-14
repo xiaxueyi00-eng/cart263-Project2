@@ -66,17 +66,7 @@ const renderer = new THREE.WebGLRenderer({
 });
 
 renderer.setSize(window.innerWidth, window.innerHeight);
-document.addEventListener("pointerdown", (e) => {
 
-
-    if (e.target.tagName === "CANVAS") {
-
-
-        console.log("canvas clicked");
-    }
-
-    // menu 点击不会被影响
-});
 /* =========================
    CONTROLS (ORBIT CAMERA)
 ========================= */
@@ -176,3 +166,4 @@ renderer.domElement.addEventListener("pointerdown", () => {
         });
     }, 2000);
 });
+

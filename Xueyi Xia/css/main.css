@@ -3,34 +3,20 @@ body {
     overflow: hidden;
 }
 
+/* ===== CANVAS BACKGROUND ===== */
 #stars {
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 0;
-}
-
-#three {
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 1;
-    pointer-events: auto;
-}
-
-/* ===== CANVAS ===== */
-canvas {
     position: fixed;
     inset: 0;
-    display: block;
-}
-
-#stars {
     z-index: 0;
+    pointer-events: none;
+
 }
 
 #three {
+    position: fixed;
+    inset: 0;
     z-index: 1;
+    pointer-events: auto;
 }
 
 /* ===== MENU ===== */
@@ -38,7 +24,6 @@ canvas {
     position: fixed;
     top: 50%;
     left: 50%;
-
     transform: translate(-50%, -50%) scale(0.7);
 
     display: flex;
@@ -47,15 +32,19 @@ canvas {
 
     min-width: 240px;
     padding: 26px;
+
     border-radius: 18px;
 
-    z-index: 9999;
+    z-index: 10;
+    opacity: 0;
+    pointer-events: none;
 
-    opacity: 1;
 
-    pointer-events: auto;
+    transition: all 0.4s ease;
 
+    z-index: 999;
 }
+
 
 #menu.show {
     opacity: 1;
@@ -63,6 +52,7 @@ canvas {
     transform: translate(-50%, -50%) scale(1);
 }
 
+/* ===== LINKS ===== */
 #menu a {
     color: white;
     text-decoration: none;
@@ -73,11 +63,9 @@ canvas {
     opacity: 0;
     transform: translateY(10px);
 
-    transition: all 0.4s ease;
+    transition: all 0.3s ease;
 
-    pointer-events: auto;
-    position: relative;
-    z-index: 999;
+    display: block;
 }
 
 /* hover */
@@ -85,4 +73,9 @@ canvas {
     background: rgba(255, 255, 255, 0.08);
     transform: translateX(6px);
     box-shadow: 0 0 12px rgba(255, 255, 255, 0.15);
+}
+
+#three {
+    pointer-events: auto;
+    z-index: 1;
 }
