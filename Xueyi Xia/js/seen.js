@@ -198,13 +198,10 @@ document.addEventListener("mousemove", (e) => {
 /* =========================
    GAME STATE
 ========================= */
-
-let eatPower = 0;
 let startTime = Date.now();
-let hp = 1;
 let timeLimit = 80;
-let gameStart = Date.now();
 let restartTriggered = false;
+
 
 let timer = document.createElement("div");
 timer.style.position = "fixed";
@@ -224,9 +221,7 @@ document.body.appendChild(timer);
 function animate() {
     requestAnimationFrame(animate);
 
-    camera.rotation.z = Math.sin(Date.now() * 0.001) * 0.01;
-
-    let elapsedTime = (Date.now() - gameStart) / 1000;
+    let elapsedTime = (Date.now() - startTime) / 1000;
 
     if (elapsedTime > timeLimit && !restartTriggered) {
         restartTriggered = true;
@@ -237,33 +232,6 @@ function animate() {
 
 
     }
-
-    let danger = 0;
-
-    //  BUG movement
-    bugs.forEach((b) => {
-        if (!b.userData.target) return;
-
-        b.position.x += (b.userData.target.x - b.position.x) * 0.02;
-        b.position.z += (b.userData.target.z - b.position.z) * 0.02;
-
-        let dx = b.position.x - (mouseX / window.innerWidth - 0.5) * 6;
-        let dz = b.position.z - (mouseY / window.innerHeight - 0.5) * 6;
-
-        let dist = Math.sqrt(dx * dx + dz * dz);
-
-        if (dist < 1) danger++;
-    });
-
-    //  UI bar
-    eatPower += danger * 0.01;
-
-    if (eatPower > 0.6) {
-        hp -= danger * 0.005;
-    }
-
-    hp = Math.max(0, Math.min(1, hp));
-    eatPower = Math.max(0, Math.min(1, eatPower));
 
 
 
@@ -276,7 +244,7 @@ function animate() {
 
         let elapsed = (Date.now() - startTime) / 3000;
 
-        if (elapsed > 10 && eatPower > 0.6) {
+        if (elapsed > 10) {
 
             key.visible = true;
 
@@ -293,14 +261,8 @@ function animate() {
 
             let dist = Math.sqrt(dx * dx + dz * dz);
 
-            if (dist < 0.8) {
-
-                story.innerText = "ESCAPE DETECTED";
-                story.style.opacity = "1";
-
-                setTimeout(() => {
-                    window.location.href = "next.html";
-                }, 1200);
+            if (dist < 1.8) {
+                window.location.href = "next.html";
             }
 
         } else {
