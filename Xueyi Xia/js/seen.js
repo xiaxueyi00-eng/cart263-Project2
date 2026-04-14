@@ -253,6 +253,7 @@ function animate() {
     // =====================
     // key logic
     // =====================
+
     if (key) {
 
         let t = (Date.now() - startTime) / 3000;
@@ -267,16 +268,35 @@ function animate() {
 
             key.rotation.y += 0.03;
 
+
             let mx = (mouseX / window.innerWidth - 0.5) * 6;
             let mz = (mouseY / window.innerHeight - 0.5) * 6;
 
             let dx = key.position.x - mx;
             let dz = key.position.z - mz;
 
-            let dist = Math.sqrt(dx * dx + dz * dz);
+            let dist = dx * dx + dz * dz;
 
-            if (dist < 1.8) {
-                window.location.href = "next.html";
+
+            if (dist < 3) {
+                key.scale.set(0.6, 0.6, 0.6); // 放大一点
+                key.material && (key.material.emissive = new THREE.Color(0xffffff));
+            } else {
+                key.scale.set(0.5, 0.5, 0.5);
+            }
+
+            if (dist < 3) {
+
+                if (!key._lockStart) {
+                    key._lockStart = Date.now();
+                }
+
+                if (Date.now() - key._lockStart > 800) {
+                    window.location.href = "next.html";
+                }
+
+            } else {
+                key._lockStart = null;
             }
 
         } else {
@@ -289,9 +309,4 @@ function animate() {
 
 animate();
 
-window.addEventListener("pointerdown", (event) => {
 
-    if (event.clientX > window.innerWidth / 2) {
-        // window.location.href = "seen.html";
-    }
-});
