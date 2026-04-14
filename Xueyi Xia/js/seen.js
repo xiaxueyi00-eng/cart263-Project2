@@ -15,6 +15,8 @@ document.body.style.background = "black";
 ========================= */
 
 let story = document.createElement("div");
+document.body.appendChild(story);
+
 story.style.position = "fixed";
 story.style.top = "40%";
 story.style.left = "50%";
@@ -25,29 +27,31 @@ story.style.fontSize = "22px";
 story.style.textAlign = "center";
 story.style.opacity = "0";
 story.style.transition = "1s";
-document.body.appendChild(story);
 
-let lines = [
+let storyLines = [
     "YOU HAVE ENTERED THE SYSTEM",
     "YOUR MOVEMENTS ARE BEING TRACKED",
     "YOU ARE NOT IN CONTROL",
     "ESCAPE IF YOU CAN"
 ];
 
-let i = 0;
+let storyIndex = 0;
 
 function showStory() {
-    if (i >= lines.length) {
+
+    if (storyIndex >= storyLines.length) {
         story.style.opacity = "0";
         return;
     }
 
-    story.innerText = lines[i];
+    story.innerText = storyLines[storyIndex];
     story.style.opacity = "1";
 
     setTimeout(() => {
         story.style.opacity = "0";
-        i++;
+
+        storyIndex++;
+
         setTimeout(showStory, 1200);
     }, 2000);
 }
@@ -135,36 +139,40 @@ let bugModels = [
     "../image/bug11.glb",
     "../image/bug12.glb",
     "../image/bug13.glb",
-    "../image/bug14.glb",
+    "../image/bug14.glb"
 ];
 
 function placeBugs() {
-    bugs.forEach(b => scene.remove(b));
+
+    // remove old
+    for (let i = 0; i < bugs.length; i++) {
+        scene.remove(bugs[i]);
+    }
+
     bugs = [];
 
-    bugModels.forEach((src) => {
-        loader.load(src, (gltf) => {
-            const model = gltf.scene;
+    for (let i = 0; i < bugModels.length; i++) {
 
-            model.traverse((child) => {
+        loader.load(bugModels[i], function (gltf) {
+
+            let model = gltf.scene;
+
+            model.traverse(function (child) {
                 if (child.isMesh) {
                     child.material = new THREE.MeshStandardMaterial({
                         color: 0xffffff,
                         roughness: 0.5,
-                        metalness: 0.1,
+                        metalness: 0.1
                     });
                 }
             });
 
-            let s = 0.25 + Math.random() * 0.25;
-            model.scale.setScalar(s);
+            let scale = 0.25 + Math.random() * 0.25;
+            model.scale.set(scale, scale, scale);
 
-            model.position.set(
-                (Math.random() - 0.5) * 8,
-                (Math.random() - 0.5) * 6,
-                (Math.random() - 0.5) * 4
-            );
-
+            model.position.x = (Math.random() - 0.5) * 8;
+            model.position.y = (Math.random() - 0.5) * 6;
+            model.position.z = (Math.random() - 0.5) * 4;
 
             model.userData.target = new THREE.Vector3(
                 (Math.random() - 0.5) * 8,
@@ -175,10 +183,11 @@ function placeBugs() {
             scene.add(model);
             bugs.push(model);
         });
-    });
+    }
 }
 
 placeBugs();
+
 
 /* =========================
    MOUSE
@@ -187,9 +196,10 @@ placeBugs();
 let mouseX = 0;
 let mouseY = 0;
 
-document.addEventListener("mousemove", (e) => {
-    mouseX = e.clientX;
-    mouseY = e.clientY;
+document.addEventListener("mousemove", function (event) {
+
+    mouseX = event.clientX;
+    mouseY = event.clientY;
 
     spotlight.style.left = (mouseX - 160) + "px";
     spotlight.style.top = (mouseY - 160) + "px";
@@ -219,45 +229,49 @@ document.body.appendChild(timer);
 ========================= */
 
 function animate() {
+
     requestAnimationFrame(animate);
 
-    let elapsedTime = (Date.now() - startTime) / 1000;
+    let now = Date.now();
+    let elapsedTime = (now - startTime) / 1000;
 
-    if (elapsedTime > timeLimit && !restartTriggered) {
+    // =====================
+    // timer
+    // =====================
+    let remaining = timeLimit - elapsedTime;
+
+    if (remaining < 0 && !restartTriggered) {
         restartTriggered = true;
-
-
         alert("Time's up! Restarting...");
         window.location.reload();
-
-
     }
 
+    if (remaining < 0) remaining = 0;
 
+    timer.innerText = "TIME LEFT: " + remaining.toFixed(1);
 
-    let remaining = Math.max(0, timeLimit - elapsedTime);
-    if (Math.floor(remaining * 10) % 2 === 0) {
-        timer.innerText = "TIME LEFT: " + remaining.toFixed(1);
-    }
-    // key movement
+    // =====================
+    // key logic
+    // =====================
     if (key) {
 
-        let elapsed = (Date.now() - startTime) / 3000;
+        let t = (Date.now() - startTime) / 3000;
 
-        if (elapsed > 10) {
+        if (t > 10) {
 
             key.visible = true;
 
-
-            key.position.x = Math.sin(elapsed * 0.5) * 3;
-            key.position.z = Math.cos(elapsed * 0.5) * 2;
-            key.position.y = Math.sin(elapsed * 1.5) * 0.8;
-
+            key.position.x = Math.sin(t * 0.5) * 3;
+            key.position.z = Math.cos(t * 0.5) * 2;
+            key.position.y = Math.sin(t * 1.5) * 0.8;
 
             key.rotation.y += 0.03;
 
-            let dx = key.position.x - (mouseX / window.innerWidth - 0.5) * 6;
-            let dz = key.position.z - (mouseY / window.innerHeight - 0.5) * 6;
+            let mx = (mouseX / window.innerWidth - 0.5) * 6;
+            let mz = (mouseY / window.innerHeight - 0.5) * 6;
+
+            let dx = key.position.x - mx;
+            let dz = key.position.z - mz;
 
             let dist = Math.sqrt(dx * dx + dz * dz);
 
@@ -269,7 +283,6 @@ function animate() {
             key.visible = false;
         }
     }
-
 
     renderer.render(scene, camera);
 }

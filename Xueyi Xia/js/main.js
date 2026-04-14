@@ -4,47 +4,55 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 /* =========================
    STAR BACKGROUND (2D CANVAS)
 ========================= */
-// Get canvas for star animation
 const starCanvas = document.querySelector("#stars");
 const ctx = starCanvas.getContext("2d");
-// Set canvas size to full screen
+
 starCanvas.width = window.innerWidth;
 starCanvas.height = window.innerHeight;
-// Fix canvas as background layer
+
 starCanvas.style.position = "fixed";
-starCanvas.style.top = 0;
-starCanvas.style.left = 0;
-starCanvas.style.zIndex = -1;
-// Create star particles
+starCanvas.style.top = "0";
+starCanvas.style.left = "0";
+starCanvas.style.zIndex = "-1";
+
 let stars = [];
+
 for (let i = 0; i < 200; i++) {
-    stars.push({
+    let star = {
         x: Math.random() * starCanvas.width,
         y: Math.random() * starCanvas.height,
         r: Math.random() * 2
-    });
+    };
+
+    stars.push(star);
 }
-// Animate stars falling downward
+
 function animateStars() {
+
     ctx.fillStyle = "black";
     ctx.fillRect(0, 0, starCanvas.width, starCanvas.height);
-    // Draw stars
+
     ctx.fillStyle = "white";
 
-    stars.forEach(s => {
+    for (let i = 0; i < stars.length; i++) {
+
+        let s = stars[i];
+
         ctx.beginPath();
         ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
         ctx.fill();
-        // Move star downward
-        s.y += 0.3;
-        // Reset position when out of screen
-        if (s.y > starCanvas.height) s.y = 0;
-    });
+
+        s.y = s.y + 0.3;
+
+        if (s.y > starCanvas.height) {
+            s.y = 0;
+        }
+    }
 
     requestAnimationFrame(animateStars);
 }
-animateStars();
 
+animateStars();
 
 /* =========================
    THREE.JS BASIC SCENE SETUP
@@ -81,7 +89,8 @@ controls.enablePan = false;
 ========================= */
 
 // Soft ambient light (global lighting)
-scene.add(new THREE.AmbientLight(0xffffff, 2));
+const ambientLight = new THREE.AmbientLight(0xffffff, 2);
+scene.add(ambientLight);
 // Directional light (like sun light)
 const light = new THREE.DirectionalLight(0xffffff, 2);
 light.position.set(5, 5, 5);
@@ -112,8 +121,9 @@ loader.load(
 );
 
 // ===== INTERACTION =====
-window.addEventListener("mousemove", () => {
-    if (model && !exploded) {
+window.addEventListener("mousemove", function () {
+
+    if (model && exploded === false) {
         model.scale.set(0.11, 0.11, 0.11);
     }
 });
@@ -121,49 +131,58 @@ window.addEventListener("mousemove", () => {
 /* =========================
    ANIMATION LOOP
 ========================= */
-
 function animate() {
+
     requestAnimationFrame(animate);
-    // Normal rotation before explosion
-    if (model && !exploded) {
-        model.rotation.y += 0.002;
+
+    if (model && exploded === false) {
+        model.rotation.y = model.rotation.y + 0.002;
     }
-    // Explosion state animation
-    if (model && exploded) {
+
+    if (model && exploded === true) {
+
         model.scale.multiplyScalar(0.98);
-        camera.position.z *= 0.99;
+
+        camera.position.z = camera.position.z * 0.99;
     }
-    // Update controls
+
     controls.update();
-    // Render scene
+
     renderer.render(scene, camera);
 }
 
 animate();
-
 /* =========================
    CLICK EVENT (TRIGGER MENU)
 ========================= */
 
 // Click model/canvas to trigger "explosion + UI reveal"
-renderer.domElement.addEventListener("pointerdown", () => {
+renderer.domElement.addEventListener("pointerdown", function () {
+
     if (!model) return;
 
     exploded = true;
 
-    const menu = document.getElementById("menu");
+    let menu = document.getElementById("menu");
+
     menu.classList.add("show");
     document.body.classList.add("menu-open");
-    // Show menu UI
-    const items = menu.querySelectorAll("a");
-    // Animate menu items appearing one by one
-    setTimeout(() => {
-        items.forEach((item, i) => {
-            setTimeout(() => {
-                item.style.opacity = "1";
-                item.style.transform = "translateY(0)";
-            }, i * 100);
-        });
+
+    let items = menu.querySelectorAll("a");
+
+    setTimeout(function () {
+
+        for (let i = 0; i < items.length; i++) {
+
+            (function (index) {
+
+                setTimeout(function () {
+                    items[index].style.opacity = "1";
+                    items[index].style.transform = "translateY(0)";
+                }, index * 100);
+
+            })(i);
+        }
+
     }, 2000);
 });
-

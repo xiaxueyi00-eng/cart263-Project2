@@ -165,85 +165,81 @@ document.addEventListener("mousemove", (e) => {
     mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
 });
 
-/* =========================
-   ANIMATE
-========================= */
+
 
 function animate() {
     requestAnimationFrame(animate);
 
+    let t = Date.now() * 0.001;
 
-    if (centerModel && balls.length > 0) {
+    // =====================
+    // balls motion
+    // =====================
+    if (balls.length > 0 && centerModel) {
 
-        balls.forEach((b, i) => {
+        let centerX = centerModel.position.x;
+        let centerY = centerModel.position.y;
+        let centerZ = centerModel.position.z;
 
+        for (let i = 0; i < balls.length; i++) {
+
+            let b = balls[i];
 
             if (!b.userData.dir) {
                 b.userData.dir = new THREE.Vector3(
-                    (Math.random() - 0.5),
-                    (Math.random() - 0.5),
-                    (Math.random() - 0.5)
-                ).normalize();
+                    Math.random() - 0.5,
+                    Math.random() - 0.5,
+                    Math.random() - 0.5
+                );
+                b.userData.dir.normalize();
             }
 
-            let t = Date.now() * 0.001;
+            let dir = b.userData.dir;
+            let base = b.userData.base;
 
             let radius = 2.5 + Math.sin(t + i) * 0.5;
 
-            b.position.x = centerModel.position.x + b.userData.dir.x * radius;
-            b.position.y = centerModel.position.y + b.userData.dir.y * radius;
-            b.position.z = centerModel.position.z + b.userData.dir.z * radius;
-        });
-    }
-
-    if (balls.length > 0) {
-
-        let t = Date.now() * 0.001;
-
-        balls.forEach((b, i) => {
-
-            let base = b.userData.base;
-
-
+            b.position.x = centerX + dir.x * radius;
             b.position.y = base.y + Math.cos(t * 1.2 + i) * 0.3;
             b.position.z = base.z + Math.sin(t * 0.8 + i) * 0.3;
-        });
-
-        balls.forEach((b) => {
-            b.position.x += Math.sin(Date.now() * 0.0002) * 0.0005;
-
-
-        });
-
-        if (balls.length > 1 && lines.length > 0) {
-
-            for (let i = 0; i < lines.length; i++) {
-
-                let a = balls[i].position;
-                let b = balls[i + 1].position;
-
-                lines[i].geometry.attributes.position.array.set([
-                    a.x, a.y, a.z,
-                    b.x, b.y, b.z
-                ]);
-
-                lines[i].geometry.attributes.position.needsUpdate = true;
-            }
         }
     }
+
+    // =====================
+    // lines motion
+    // =====================
+    for (let i = 0; i < lines.length; i++) {
+
+        let line = lines[i];
+
+        let a = balls[i];
+        let b = balls[i + 1];
+
+
+        if (!a || !b) continue;
+
+        let pos = line.geometry.attributes.position.array;
+
+        pos[0] = a.position.x;
+        pos[1] = a.position.y;
+        pos[2] = a.position.z;
+
+        pos[3] = b.position.x;
+        pos[4] = b.position.y;
+        pos[5] = b.position.z;
+
+        line.geometry.attributes.position.needsUpdate = true;
+    }
+
+    // =====================
+    // camera
+    // =====================
     camera.position.x += (mouseX * 1.5 - camera.position.x) * 0.02;
     camera.position.y += (-mouseY * 1.5 - camera.position.y) * 0.02;
+
     camera.lookAt(scene.position);
 
     renderer.render(scene, camera);
 }
 
 animate();
-
-window.addEventListener("click", (event) => {
-    const isRight = event.clientX > window.innerWidth / 2;
-
-    if (!isRight) return;
-
-    window.location.href = "seen.html";
-});
