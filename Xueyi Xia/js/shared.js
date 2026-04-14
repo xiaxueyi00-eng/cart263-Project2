@@ -1,230 +1,201 @@
 import * as THREE from "three";
-/* ======================
-   Background Image
-====================== */
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 
-document.documentElement.style.backgroundColor = "black";
-document.body.style.backgroundColor = "black";
+/* =========================
+   BASIC SETUP
+========================= */
 
 document.body.style.margin = "0";
 document.body.style.overflow = "hidden";
+document.body.style.background = "black";
 
-
-/* ======================
-   Scene
-====================== */
 const scene = new THREE.Scene();
 
-/* ======================
-   Renderer
-====================== */
-const renderer = new THREE.WebGLRenderer({ alpha: true });
-renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setClearColor(0x000000, 0);
-document.body.appendChild(renderer.domElement);
-
-
-renderer.domElement.style.position = "fixed";
-renderer.domElement.style.top = "0";
-renderer.domElement.style.left = "0";
-
-
-
-/* ======================
-   Fog
-====================== */
-scene.fog = new THREE.Fog(0x000000, 1, 10);
-
-/* ======================
-   Camera
-====================== */
 const camera = new THREE.PerspectiveCamera(
     75,
     window.innerWidth / window.innerHeight,
     0.1,
     1000
 );
-camera.position.z = 8;
-camera.lookAt(0, 0, 0);
+camera.position.z = 5;
 
-/* ======================
-   Light
-====================== */
-scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement);
 
-const light = new THREE.DirectionalLight(0xffffff, 1);
+/* =========================
+   LIGHT
+========================= */
+
+scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+
+const light = new THREE.DirectionalLight(0xffffff, 1.5);
 light.position.set(5, 5, 5);
 scene.add(light);
 
-/* ======================
-   Nodes
-====================== */
-const nodes = [];
-const geometry = new THREE.SphereGeometry(0.3, 16, 16);
+/* =========================
+   LOADER
+========================= */
 
-function createNode(x, y, z, type = "normal") {
-    const material = new THREE.MeshStandardMaterial({
-        color: 0x4da3ff,
-        emissive: 0x001a33,
-        emissiveIntensity: 1.2,
-        roughness: 0.2,
-    });
+const loader = new GLTFLoader();
 
-    const mesh = new THREE.Mesh(geometry, material);
-    mesh.position.set(x, y, z);
+/* =========================
+   CENTER MODEL (human)
+========================= */
 
-    mesh.userData = {
-        type,
-        state: "normal",
-        neighbors: []
-    };
+let centerModel;
 
-    scene.add(mesh);
-    nodes.push(mesh);
-    return mesh;
-}
-
-/* ======================
-   Generate Nodes
-====================== */
-for (let i = 0; i < 300; i++) {
-    createNode(
-        (Math.random() - 0.5) * 10,
-        (Math.random() - 0.5) * 10,
-        (Math.random() - 0.5) * 10,
-        Math.random() < 0.2 ? "immune" : "normal"
-    );
-}
-
-/* ======================
-   Build Connections
-====================== */
-function buildConnections() {
-    for (let a of nodes) {
-        for (let b of nodes) {
-            if (a === b) continue;
-
-            const dist = a.position.distanceTo(b.position);
-            if (dist < 3) {
-                a.userData.neighbors.push(b);
-            }
-        }
-    }
-}
-buildConnections();
-
-/* ======================
-   Infection System
-====================== */
-function infect(node, delay = 300) {
-    node.scale.set(2.2, 2.2, 2.2);
-
-    setTimeout(() => {
-        node.scale.set(1, 1, 1);
-    }, 150);
-    if (node.userData.state !== "normal") return;
-    if (node.userData.type === "immune") return;
-
-    node.userData.state = "infected";
-
-    node.material.color.set(0xff3355);
-    node.material.emissive.set(0xff0033);
-    node.material.emissiveIntensity = 2;
-    node.scale.set(1.6, 1.6, 1.6);
-
-    setTimeout(() => {
-        node.scale.set(1, 1, 1);
-        node.material.emissiveIntensity = 1.2;
-    }, 200);
-
-    setTimeout(() => {
-        node.userData.neighbors.forEach((n) => {
-            if (n.userData.state === "normal") {
-
-
-                createTrailLine(node, n);
-
-
-                if (Math.random() < 0.4) {
-                    infect(n, delay + 300);
-                }
-            }
-        });
-    }, delay);
-}
-
-/* ======================
-   Click Interaction
-====================== */
-const raycaster = new THREE.Raycaster();
-const mouse = new THREE.Vector2();
-
-window.addEventListener("click", (event) => {
-    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
-    raycaster.setFromCamera(mouse, camera);
-
-    const hits = raycaster.intersectObjects(nodes);
-
-    if (hits.length > 0) {
-        infect(hits[0].object);
-    }
-
-
+loader.load("../image/human.glb", (gltf) => {
+    centerModel = gltf.scene;
+    centerModel.scale.set(1, 1, 1);
+    scene.add(centerModel);
 });
 
+/* =========================
+   BALLS SYSTEM
+========================= */
 
-function createTrailLine(a, b) {
-    const points = [
-        a.position.clone(),
-        b.position.clone()
-    ];
-
-    const geometry = new THREE.BufferGeometry().setFromPoints(points);
-
-    const material = new THREE.LineBasicMaterial({
-        color: 0xff3355,
-        transparent: true,
-        opacity: 0.6
-    });
-
-    const line = new THREE.Line(geometry, material);
-    scene.add(line);
+let balls = [];
+const ballCount = 58;
+let lines = [];
 
 
-    let alpha = 1;
+loader.load("../image/ball.glb", (gltf) => {
 
-    function fade() {
-        alpha -= 0.02;
-        line.material.opacity = alpha;
+    for (let i = 0; i < ballCount; i++) {
 
-        if (alpha <= 0) {
-            scene.remove(line);
-        } else {
-            requestAnimationFrame(fade);
-        }
+        const b = gltf.scene.clone();
+
+
+        const scale = 3 + Math.random() * 2;
+        b.scale.set(scale, scale, scale);
+
+
+        b.position.set(
+            (Math.random() - 0.5) * 12,
+            (Math.random() - 0.5) * 8,
+            (Math.random() - 0.5) * 10
+        );
+
+        // 🧠 记录初始位置（用于漂浮）
+        b.userData.base = b.position.clone();
+        b.userData.offset = Math.random() * 100;
+
+        scene.add(b);
+        balls.push(b);
     }
+});
 
-    fade();
+/* =========================
+   LINES
+========================= */
+
+const lineMaterial = new THREE.LineBasicMaterial({
+    color: 0xffffff,
+    transparent: true,
+    opacity: 0.5
+});
+
+for (let i = 0; i < ballCount - 1; i++) {
+
+    const geometry = new THREE.BufferGeometry().setFromPoints([
+        new THREE.Vector3(),
+        new THREE.Vector3()
+    ]);
+
+    const line = new THREE.Line(geometry, lineMaterial);
+
+    scene.add(line);
+    lines.push(line);
 }
-/* ======================
-   Animate
-====================== */
+
+/* =========================
+   MOUSE
+========================= */
+
+let mouseX = 0;
+let mouseY = 0;
+
+document.addEventListener("mousemove", (e) => {
+    mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
+    mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
+});
+
+/* =========================
+   ANIMATE
+========================= */
+
 function animate() {
     requestAnimationFrame(animate);
 
-    nodes.forEach((n, i) => {
-        n.position.y += Math.sin(Date.now() * 0.001 + i) * 0.001;
-    });
+    // if (centerModel) {
+    //     centerModel.position.x += (mouseX * 2 - centerModel.position.x) * 0.05;
+    //     centerModel.position.y += (-mouseY * 2 - centerModel.position.y) * 0.05;
+    // }
 
-    nodes.forEach((n) => {
-        if (n.userData.state === "infected") {
-            const s = 1 + Math.sin(Date.now() * 0.01) * 0.08;
-            n.scale.set(s, s, s);
+    if (centerModel && balls.length > 0) {
+
+        balls.forEach((b, i) => {
+
+
+            if (!b.userData.dir) {
+                b.userData.dir = new THREE.Vector3(
+                    (Math.random() - 0.5),
+                    (Math.random() - 0.5),
+                    (Math.random() - 0.5)
+                ).normalize();
+            }
+
+            let t = Date.now() * 0.001;
+
+            let radius = 2.5 + Math.sin(t + i) * 0.5;
+
+            b.position.x = centerModel.position.x + b.userData.dir.x * radius;
+            b.position.y = centerModel.position.y + b.userData.dir.y * radius;
+            b.position.z = centerModel.position.z + b.userData.dir.z * radius;
+        });
+    }
+
+    if (balls.length > 0) {
+
+        let t = Date.now() * 0.001;
+
+        balls.forEach((b, i) => {
+
+            let base = b.userData.base;
+
+            b.position.x = base.x + Math.sin(t + b.userData.offset) * 0.3;
+            b.position.y = base.y + Math.cos(t * 1.2 + i) * 0.3;
+            b.position.z = base.z + Math.sin(t * 0.8 + i) * 0.3;
+        });
+
+        balls.forEach((b) => {
+            b.position.x += Math.sin(Date.now() * 0.0002) * 0.0005;
+        });
+
+        if (balls.length > 1 && lines.length > 0) {
+
+            for (let i = 0; i < lines.length; i++) {
+
+                let a = balls[i].position;
+                let b = balls[i + 1].position;
+
+                lines[i].geometry.setFromPoints([a, b]);
+            }
         }
-    });
+    }
+
     renderer.render(scene, camera);
 }
 
 animate();
+
+/* =========================
+   RESIZE
+========================= */
+
+window.addEventListener("resize", () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+});
