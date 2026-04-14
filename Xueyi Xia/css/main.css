@@ -46,10 +46,15 @@ canvas {
     gap: 12px;
 
     min-width: 240px;
-
     padding: 26px;
-
     border-radius: 18px;
+
+    z-index: 9999;
+
+    opacity: 1;
+
+    pointer-events: auto;
+
 }
 
 #menu.show {
