@@ -10,6 +10,7 @@ document.body.style.overflow = "hidden";
 document.body.style.background = "black";
 
 const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x000000);
 
 const camera = new THREE.PerspectiveCamera(
     75,
@@ -71,6 +72,7 @@ loader.load("../image/ball.glb", (gltf) => {
         b.scale.set(scale, scale, scale);
 
 
+
         b.position.set(
             (Math.random() - 0.5) * 12,
             (Math.random() - 0.5) * 8,
@@ -90,11 +92,10 @@ loader.load("../image/ball.glb", (gltf) => {
 /* =========================
    LINES
 ========================= */
-
 const lineMaterial = new THREE.LineBasicMaterial({
-    color: 0xffffff,
+    color: 0x6fa8dc,
     transparent: true,
-    opacity: 0.5
+    opacity: 0.6
 });
 
 for (let i = 0; i < ballCount - 1; i++) {
@@ -161,13 +162,15 @@ function animate() {
 
             let base = b.userData.base;
 
-            b.position.x = base.x + Math.sin(t + b.userData.offset) * 0.3;
+
             b.position.y = base.y + Math.cos(t * 1.2 + i) * 0.3;
             b.position.z = base.z + Math.sin(t * 0.8 + i) * 0.3;
         });
 
         balls.forEach((b) => {
             b.position.x += Math.sin(Date.now() * 0.0002) * 0.0005;
+
+
         });
 
         if (balls.length > 1 && lines.length > 0) {
@@ -177,10 +180,18 @@ function animate() {
                 let a = balls[i].position;
                 let b = balls[i + 1].position;
 
-                lines[i].geometry.setFromPoints([a, b]);
+                lines[i].geometry.attributes.position.array.set([
+                    a.x, a.y, a.z,
+                    b.x, b.y, b.z
+                ]);
+
+                lines[i].geometry.attributes.position.needsUpdate = true;
             }
         }
     }
+    camera.position.x += (mouseX * 1.5 - camera.position.x) * 0.02;
+    camera.position.y += (-mouseY * 1.5 - camera.position.y) * 0.02;
+    camera.lookAt(scene.position);
 
     renderer.render(scene, camera);
 }
