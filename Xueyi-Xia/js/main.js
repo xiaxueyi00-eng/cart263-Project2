@@ -106,7 +106,7 @@ let exploded = false;  // state: whether animation is triggered
 
 
 loader.load(
-    "Xueyi-Xia/image/earth.glb",
+    "../image/earth.glb",
     (gltf) => {
         model = gltf.scene;
 
