@@ -6,6 +6,7 @@ const mouse = new THREE.Vector2();
 // State variables controlling interaction modes
 let humanGlowing = false;
 let electricMode = false;
+let systemIntensity = 0;
 /* =========================
    TITLE UI (CENTER TEXT)
 ========================= */
@@ -57,6 +58,11 @@ camera.position.z = 5;
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
+
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
 
 /* =========================
    LIGHTING
@@ -181,6 +187,9 @@ function animate() {
     requestAnimationFrame(animate);
 
     let t = Date.now() * 0.001;
+
+    controls.update();
+
     /* =====================
           BALL MOVEMENT (ORBIT SYSTEM)
        ===================== */
@@ -196,6 +205,7 @@ function animate() {
 
             // Generate random direction once per ball
             if (!ball.userData.dir) {
+                0.01 * systemIntensity
 
                 ball.userData.dir = new THREE.Vector3(
                     Math.random() - 0.5,
@@ -208,7 +218,11 @@ function animate() {
             let base = ball.userData.base;
 
             // Dynamic radius creates breathing/orbit effect
-            let radius = 2.5 + Math.sin(t + i) * 0.5;
+            let baseRadius = 2.5;
+            let radius = Math.max(
+                0.8,
+                baseRadius - systemIntensity + Math.sin(t + i) * 0.5
+            );
 
             // Orbital movement around center model
             ball.position.x = centerX + dir.x * radius;
@@ -254,14 +268,7 @@ function animate() {
         line.geometry.attributes.position.needsUpdate = true;
     }
 
-    /* =====================
-       CAMERA FOLLOW MOUSE
-    ===================== */
 
-    camera.position.x += (mouseX * 1.5 - camera.position.x) * 0.02;
-    camera.position.y += (-mouseY * 1.5 - camera.position.y) * 0.02;
-
-    camera.lookAt(scene.position);
 
     /* =====================
        RENDER SCENE
@@ -318,9 +325,13 @@ window.addEventListener("pointerdown", function (event) {
         if (humanGlowing == true) {
             humanGlowing = false;
             electricMode = false;
+
         } else {
             humanGlowing = true;
             electricMode = true;
+            systemIntensity += 0.5;
+
+
         }
 
         // =========================
