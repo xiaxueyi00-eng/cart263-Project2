@@ -34,7 +34,7 @@ let fakeFiles;
 let fakeCount = 0;
 let fakeText;
 let timerText;
-let timerLeft = 30;
+let timeLeft = 30;
 let deletedTraces = 0;
 let remainingText;
 let lostText;
@@ -51,6 +51,7 @@ let warningBox;
 let thoughtBox;
 let thoughtText;
 let thoughtVisible = false;
+
 
 
 
@@ -233,11 +234,23 @@ function create() {
 
     exitDoor = this.physics.add.sprite(400, 500, "door");
     exitDoor.anims.play("doorOpen", true);
+    exitDoor.setVisible(false);
+    exitDoor.body.enable = false;
 
     this.time.delayedCall(2000, () => {
         playerInvincible = false;
     });
 
+    this.time.addEvent({
+        delay: 1000,
+        repeat: 29,
+        callback: () => {
+
+            timeLeft--;
+            timerText.setText("Uploading In 0:" + timeLeft);
+
+        }
+    });
 }
 
 function update() {
@@ -338,7 +351,6 @@ function collectFile(player, file) {
         onComplete: () => file.destroy()
     });
 
-    // remainingTraces--;
     deletedTraces++;
 
     if (deletedTraces === 5) {
@@ -367,6 +379,7 @@ function collectFile(player, file) {
 
     spawnFakeTrace(Phaser.Math.Between(80, 720), Phaser.Math.Between(80, 520));
     updateScoreText();
+
 
 }
 
@@ -400,7 +413,6 @@ function hitRobot(player, robot) {
     if (deletedTraces > 0) {
 
         deletedTraces--;
-        // remainingTraces++;
         spawnTrace();
         updateScoreText();
 
