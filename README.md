@@ -2,7 +2,7 @@
 Cart 263 project II
 - Team work : Xueyi Xia, Weini Wang
 - github live link：https://github.com/xiaxueyi00-eng/cart263-Project2
-- github repositories link：https://xiaxueyi00-eng.github.io/cart263-Project2/
+- github repositories link：https://xiaxueyi00-eng.github.io/cart263-Project2/Xueyi-Xia/html/index.html
 
 # Interactive Web Project
 Project Overview
