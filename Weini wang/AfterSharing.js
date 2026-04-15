@@ -30,8 +30,10 @@ const game = new Phaser.Game(config);
 let player;
 let cursors;
 let files;
-let fileCount = 0;
-let fileText;
+let remainingTraces = 10;
+let deletedTraces = 0;
+let remainingText;
+let deletedText;
 let robots;
 let hitCooldown = false;
 
@@ -49,7 +51,7 @@ function preload() {
 
     this.load.spritesheet("robots", "image/robots.png", {
         frameWidth: 16,
-        frameHeight: 32
+        frameHeight: 19
     });
 }
 
@@ -89,21 +91,19 @@ function create() {
     files = this.physics.add.group();
 
     for (let i = 0; i < 10; i++) {
-
-        let file = this.physics.add.image(
-            Phaser.Math.Between(80, 720),
-            Phaser.Math.Between(80, 520),
-            "trace"
-        );
-        file.setScale(0.3);
-        files.add(file);
+        spawnTrace();
     }
 
-    fileText = this.add.text(100, 20, "Deleted Traces: 0/10", {
+    remainingText = this.add.text(20, 20, "Remaining Traces: 10", {
         fontSize: "12px",
         color: "#ffffff",
-        fontFamily: "'Space Mono'",
-        align: "center"
+        fontFamily: "'Space Mono'"
+    });
+
+    deletedText = this.add.text(20, 40, "Deleted Traces: 0", {
+        fontSize: "12px",
+        color: "#ffffff",
+        fontFamily: "'Space Mono'"
     });
 
     this.physics.add.overlap(player, files, collectFile, null, this);
@@ -131,8 +131,8 @@ function create() {
         robot.body.setCollideWorldBounds(true);
         robot.body.setBounce(1, 1);
 
-        let speedX = Phaser.Math.Between(-80, 80);
-        let speedY = Phaser.Math.Between(-80, 80);
+        let speedX = Phaser.Math.Between(-100, 100);
+        let speedY = Phaser.Math.Between(-100, 100);
 
         if (speedX === 0) speedX = 50;
         if (speedY === 0) speedY = -50;
@@ -140,10 +140,16 @@ function create() {
         robot.body.setVelocity(speedX, speedY);
 
     }
+
+    this.physics.add.overlap(player, robots, hitRobot, null, this);
 }
 
 function update() {
     player.body.setVelocity(0);
+
+    if (hitCooldown) {
+        return;
+    }
 
     if (cursors.left.isDown) {
         player.setVelocityX(-120);
@@ -190,11 +196,57 @@ function update() {
         }
 
     });
+
+
 }
 
 function collectFile(player, file) {
     file.destroy();
-    fileCount++;
-    fileText.setText("Deleted Traces: " + fileCount + " / 10");
+
+    remainingTraces--;
+    deletedTraces++;
+
+    updateScoreText();
+
+    if (remainingTraces === 0 && !doorOpen) {
+        openExitDoor();
+    }
 }
 
+function spawnTrace() {
+    let file = files.create(
+        Phaser.Math.Between(80, 720),
+        Phaser.Math.Between(80, 520),
+        "trace"
+    );
+
+    file.setScale(0.3);
+}
+
+function hitRobot(player, robot) {
+    if (hitCooldown) return;
+
+    hitCooldown = true;
+
+    player.setVelocity(0, 0);
+    player.body.allowGravity = false;
+
+    remainingTraces++;
+    spawnTrace();
+    updateScoreText();
+
+    player.setTint(0xff0000);
+
+    this.time.delayedCall(3000, () => {
+        hitCooldown = false;
+
+        player.clearTint();
+        player.body.allowGravity = true;
+
+    });
+}
+
+function updateScoreText() {
+    remainingText.setText("Remaining Traces: " + remainingTraces);
+    deletedText.setText("Deleted Traces: " + deletedTraces);
+}
