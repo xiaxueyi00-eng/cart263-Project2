@@ -36,6 +36,7 @@ let fakeText;
 let remainingTraces = 10;
 let deletedTraces = 0;
 let remainingText;
+let lostText;
 let deletedText;
 let robots;
 let hunterRobot;
@@ -148,7 +149,7 @@ function create() {
     thoughtBox.setVisible(false);
     thoughtBox.setDepth(1000);
 
-    thoughtText = this.add.text(400, 300, "Archived thought appears here.", {
+    thoughtText = this.add.text(400, 300, "", {
         fontSize: "14px",
         color: "#ffffff",
         fontFamily: "'Space Mono'",
@@ -160,7 +161,7 @@ function create() {
     thoughtText.setDepth(1001);
 
     let savedThought = localStorage.getItem("lastThought");
-    console.log(savedThought);
+    //console.log(savedThought);
 
     player.on("pointerdown", () => {
         thoughtVisible = !thoughtVisible;
@@ -363,13 +364,32 @@ function hitRobot(player, robot) {
     player.setVelocity(0, 0);
     player.body.allowGravity = false;
 
-    remainingTraces++;
-    spawnTrace();
-    updateScoreText();
+    if (deletedTraces > 0) {
+
+        deletedTraces--;
+        remainingTraces++;
+        spawnTrace();
+        updateScoreText();
+
+        let lostText = this.add.text(player.x, player.y - 20, "COLLECTED -1", {
+            fontSize: "14px",
+            color: "#ff0000",
+            fontFamily: "'Space Mono'"
+        }).setOrigin(0.5);
+        lostText.setDepth(1001);
+
+        this.tweens.add({
+            targets: lostText,
+            y: lostText.y - 30,
+            alpha: 0,
+            duration: 800,
+            onComplete: () => lostText.destroy()
+        });
+    }
 
     player.setTint(0xff0000);
 
-    warningText.setText("TRACE DETECTED");
+    warningText.setText("ARCHIVE BREACHED");
     warningText.setVisible(true);
     warningBox.setVisible(true);
 
