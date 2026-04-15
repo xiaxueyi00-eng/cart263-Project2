@@ -106,15 +106,18 @@ let exploded = false;  // state: whether animation is triggered
 
 
 loader.load(
-    "../image/earth.glb",
+    "Xueyi-Xia/image/earth.glb",
     (gltf) => {
         model = gltf.scene;
+
         // Scale model down
         model.scale.set(0.1, 0.1, 0.1);
+
         // Center model geometry
         const box = new THREE.Box3().setFromObject(model);
         const center = box.getCenter(new THREE.Vector3());
         model.position.sub(center);
+
         // Add model to scene
         scene.add(model);
     }
