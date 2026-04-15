@@ -32,6 +32,9 @@ let cursors;
 let files;
 let fileCount = 0;
 let fileText;
+let robots;
+let hitCooldown = false;
+
 
 
 function preload() {
@@ -43,6 +46,11 @@ function preload() {
     this.load.image("frame", "image/background.png");
 
     this.load.image("trace", "image/trace.png");
+
+    this.load.spritesheet("robots", "image/robots.png", {
+        frameWidth: 16,
+        frameHeight: 32
+    });
 }
 
 function create() {
@@ -88,7 +96,6 @@ function create() {
             "trace"
         );
         file.setScale(0.3);
-        this.physics.add.existing(file);
         files.add(file);
     }
 
@@ -99,9 +106,40 @@ function create() {
         align: "center"
     });
 
-
     this.physics.add.overlap(player, files, collectFile, null, this);
 
+    robots = this.physics.add.group();
+
+    this.anims.create({
+        key: "robotWalk",
+        frames: this.anims.generateFrameNumbers("robots", {
+            start: 0,
+            end: 7
+        }),
+        frameRate: 6,
+        repeat: -1
+    });
+
+    for (let i = 0; i < 10; i++) {
+        let robot = robots.create(
+            Phaser.Math.Between(80, 720),
+            Phaser.Math.Between(80, 520),
+            "robots"
+        );
+        robot.setScale(2);
+        robot.anims.play("robotWalk", true);
+        robot.body.setCollideWorldBounds(true);
+        robot.body.setBounce(1, 1);
+
+        let speedX = Phaser.Math.Between(-80, 80);
+        let speedY = Phaser.Math.Between(-80, 80);
+
+        if (speedX === 0) speedX = 50;
+        if (speedY === 0) speedY = -50;
+
+        robot.body.setVelocity(speedX, speedY);
+
+    }
 }
 
 function update() {
@@ -136,13 +174,22 @@ function update() {
         player.setFlipX(false);
     }
 
-
     else {
         player.setVelocity(0);
 
         player.anims.stop();
     }
 
+
+    robots.getChildren().forEach(function (robot) {
+
+        if (robot.body.velocity.x < 0) {
+            robot.setFlipX(true);
+        } else if (robot.body.velocity.x > 0) {
+            robot.setFlipX(false);
+        }
+
+    });
 }
 
 function collectFile(player, file) {
