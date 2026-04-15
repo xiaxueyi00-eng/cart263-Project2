@@ -1,5 +1,7 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+let mouseX = 0;
+let mouseY = 0;
 
 // Game state controller (used to switch between PLAYING / WIN)
 let STATE = "PLAYING";
@@ -175,9 +177,9 @@ function placeBugs() {
             model.traverse(function (child) {
                 if (child.isMesh) {
                     child.material = new THREE.MeshStandardMaterial({
-                        color: 0xffffff,
-                        roughness: 0.5,
-                        metalness: 0.1
+                        color: 0xff3b3b
+
+
                     });
                 }
             });
@@ -203,8 +205,6 @@ function placeBugs() {
 // Spawn bugs into the scene
 placeBugs();
 
-let mouseX = 0;
-let mouseY = 0;
 
 /* =========================
    MOUSE
