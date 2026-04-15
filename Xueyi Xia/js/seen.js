@@ -203,6 +203,8 @@ function placeBugs() {
 // Spawn bugs into the scene
 placeBugs();
 
+let mouseX = 0;
+let mouseY = 0;
 
 /* =========================
    MOUSE
@@ -313,7 +315,7 @@ function animate() {
         }
     }
 
-
+    // Render scene each frame
     renderer.render(scene, camera);
 }
 

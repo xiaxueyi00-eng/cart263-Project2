@@ -279,43 +279,85 @@ animate();
    CLICK INTERACTION (RAYCASTING)
 ========================= */
 
-window.addEventListener("pointerdown", (event) => {
+window.addEventListener("pointerdown", function (event) {
 
-    // Convert mouse position to normalized device coordinates
-    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+    // If model is not ready, stop running the code
+    if (centerModel == null) {
+        return;
+    }
 
-    // Set ray from camera through mouse position
+    // =========================
+    // 1. Get mouse position on screen
+    // =========================
+    var mouseX = event.clientX;
+    var mouseY = event.clientY;
+
+    // =========================
+    // 2. Convert screen position to Three.js coordinates (-1 to 1)
+    // =========================
+    var x = (mouseX / window.innerWidth) * 2 - 1;
+    var y = -(mouseY / window.innerHeight) * 2 + 1;
+
+    mouse.x = x;
+    mouse.y = y;
+
+    // =========================
+    // 3. Set ray from camera
+    // =========================
     raycaster.setFromCamera(mouse, camera);
 
-    if (!centerModel) return;
+    // =========================
+    // 4. Check if the model is clicked
+    // =========================
+    var result = raycaster.intersectObject(centerModel, true);
 
-    // Detect intersection with human model
-    const hits = raycaster.intersectObject(centerModel, true);
+    if (result.length > 0) {
 
-    if (hits.length > 0) {
+        // =========================
+        // 5. Toggle glow state (on / off)
+        // =========================
+        if (humanGlowing == true) {
+            humanGlowing = false;
+            electricMode = false;
+        } else {
+            humanGlowing = true;
+            electricMode = true;
+        }
 
-        // Toggle visual/electric state
-        humanGlowing = !humanGlowing;
-        electricMode = humanGlowing;
+        // =========================
+        // 6. Change model material color
+        // =========================
+        centerModel.traverse(function (child) {
 
-        // Apply emissive glow effect
-        centerModel.traverse((child) => {
+            if (child.isMesh == true) {
 
-            if (!child.isMesh) return;
+                // If glowing is ON
+                if (humanGlowing == true) {
+                    child.material.emissive = new THREE.Color(0x4aa3ff);
+                    child.material.emissiveIntensity = 1.5;
+                }
 
-            child.material.emissive = new THREE.Color(
-                humanGlowing ? 0x4aa3ff : 0x000000
-            );
-
-            child.material.emissiveIntensity = humanGlowing ? 1.5 : 0;
+                // If glowing is OFF
+                else {
+                    child.material.emissive = new THREE.Color(0x000000);
+                    child.material.emissiveIntensity = 0;
+                }
+            }
         });
 
-        // Detect click side of screen
-        const isRightSide = event.clientX > window.innerWidth / 2;
+        // =========================
+        // 7. Check if click is on the right side of screen
+        // =========================
+        var isRightSide = false;
 
-        // Navigate to next page if clicked on right side
-        if (isRightSide) {
+        if (mouseX > window.innerWidth / 2) {
+            isRightSide = true;
+        }
+
+        // =========================
+        // 8. If right side clicked, go to next page
+        // =========================
+        if (isRightSide == true) {
             window.location.href = "seen.html";
         }
     }

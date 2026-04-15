@@ -159,30 +159,61 @@ animate();
 // Click model/canvas to trigger "explosion + UI reveal"
 renderer.domElement.addEventListener("pointerdown", function () {
 
-    if (!model) return;
+    // If model is not loaded, stop running
+    if (model == null) {
+        return;
+    }
 
+    // =========================
+    // 1. Set state
+    // =========================
     exploded = true;
 
-    let menu = document.getElementById("menu");
+    // =========================
+    // 2. Get menu element
+    // =========================
+    var menu = document.getElementById("menu");
 
+    // =========================
+    // 3. Show menu (add CSS class)
+    // =========================
     menu.classList.add("show");
     document.body.classList.add("menu-open");
 
-    let items = menu.querySelectorAll("a");
+    // =========================
+    // 4. Get all menu items (links)
+    // =========================
+    var items = menu.querySelectorAll("a");
 
+    // =========================
+    // 5. Wait before animation starts
+    // =========================
     setTimeout(function () {
 
-        for (let i = 0; i < items.length; i++) {
+        // =========================
+        // 6. Show items one by one
+        // =========================
+        for (var i = 0; i < items.length; i++) {
 
-            (function (index) {
-
-                setTimeout(function () {
-                    items[index].style.opacity = "1";
-                    items[index].style.transform = "translateY(0)";
-                }, index * 100);
-
-            })(i);
+            showItem(items[i], i);
         }
 
     }, 2000);
 });
+
+
+// =========================
+// Helper function: show each menu item
+// =========================
+function showItem(item, index) {
+
+    setTimeout(function () {
+
+        // Make item visible
+        item.style.opacity = "1";
+
+        // Move item to normal position
+        item.style.transform = "translateY(0)";
+
+    }, index * 100);
+}
