@@ -38,6 +38,7 @@ let deletedTraces = 0;
 let remainingText;
 let deletedText;
 let robots;
+let hunterRobot;
 let hitCooldown = false;
 let exitDoor;
 let doorOpen = false
@@ -201,11 +202,18 @@ function create() {
         robot.body.setCollideWorldBounds(true);
         robot.body.setBounce(0.2);
 
+        if (i === 0) {
+            hunterRobot = robot;
+            robot.setTint(0xff8888);
+            robot.targetFake = null;
+        }
+
         moveRobot.call(this, robot);
 
     }
 
     this.physics.add.overlap(player, robots, hitRobot, null, this);
+    this.physics.add.overlap(hunterRobot, fakeFiles, robotEatFake, null, this);
 
     this.anims.create({
         key: "doorOpen",
@@ -267,6 +275,32 @@ function update() {
 
     robots.getChildren().forEach(function (robot) {
 
+        if (robot === hunterRobot) {
+            let targets = fakeFiles.getChildren().filter(f => f.active);
+
+            if (targets.length > 0) {
+
+                if (!robot.targetFake || !robot.targetFake.active) {
+                    robot.targetFake = Phaser.Math.RND.pick(targets);
+                }
+
+                let angle = Phaser.Math.Angle.Between(
+                    robot.x,
+                    robot.y,
+                    robot.targetFake.x,
+                    robot.targetFake.y
+                );
+
+                let speed = 90;
+
+                robot.setVelocity(
+                    Math.cos(angle) * speed,
+                    Math.sin(angle) * speed
+                );
+            } else {
+                robot.targetFake = null;
+            }
+        }
         if (robot.body.velocity.x < 0) {
             robot.setFlipX(true);
         } else if (robot.body.velocity.x > 0) {
@@ -363,8 +397,8 @@ function hitRobot(player, robot) {
 }
 
 function updateScoreText() {
-    remainingText.setText("Remaining Traces: " + remainingTraces);
-    deletedText.setText("Deleted Traces: " + deletedTraces);
+    remainingText.setText("Yellow Left: " + remainingTraces);
+    deletedText.setText("Collected: " + deletedTraces);
 
 }
 
@@ -390,3 +424,24 @@ function moveRobot(robot) {
     });
 }
 
+function robotEatFake(robot, fake) {
+
+    if (!fake.active) return;
+
+    fake.disableBody(true, false);
+
+    this.tweens.add({
+        targets: fake,
+        alpha: 0,
+        scale: 0,
+        duration: 150,
+        onComplete: () => fake.destroy()
+    });
+
+    fakeCount--;
+    fakeText.setText("Fake Traces: " + fakeCount);
+
+    robot.setTint(0xff4444);
+
+    robot.targetFake = null;
+}
