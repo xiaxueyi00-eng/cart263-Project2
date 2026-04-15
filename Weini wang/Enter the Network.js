@@ -389,6 +389,14 @@ function animate() {
             }
         }
 
+        //if node and mainC is absorption, hide line
+        if (!node.visible || !mainC.visible) {
+            line.visible = false;
+            continue;
+        } else {
+            line.visible = true;
+        }
+
         //get the node and mainc position
         node.getWorldPosition(tempNodeWorld);
         mainC.getWorldPosition(tempMainWorld);
@@ -474,6 +482,19 @@ function animate() {
         if (mainC.scale.x < 0.02) {
             mainC.visible = false;
             shrinkMainC = false;
+
+            for (let i = 0; i < lines.length; i++) {
+                lines[i].visible = false;
+            }
+
+            for (let i = 0; i < dataFlows.length; i++) {
+                dataFlows[i].visible = false;
+            }
+
+            //jump to next page
+            setTimeout(() => {
+                window.location.href = "AfterSharing.html";
+            }, 800);
         }
     }
 

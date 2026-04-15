@@ -125,7 +125,7 @@ function create() {
     warningText.setVisible(false);
     warningText.setDepth(1000);
 
-    thoughtBox = this.add.rectangle(400, 300, 420, 120, 0x000000, 0.8);
+    thoughtBox = this.add.rectangle(400, 300, 420, 120, 0x000000);
     thoughtBox.setStrokeStyle(1, 0xffffff);
     thoughtBox.setVisible(false);
     thoughtBox.setDepth(1000);
@@ -158,7 +158,6 @@ function create() {
             thoughtText.setText("No archived thought found.");
         }
     });
-
 
     this.physics.add.overlap(player, files, collectFile, null, this);
 
