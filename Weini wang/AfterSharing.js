@@ -123,10 +123,12 @@ function create() {
     }).setOrigin(0.5);
 
     warningText.setVisible(false);
+    warningText.setDepth(1000);
 
     thoughtBox = this.add.rectangle(400, 300, 420, 120, 0x000000, 0.8);
     thoughtBox.setStrokeStyle(1, 0xffffff);
     thoughtBox.setVisible(false);
+    thoughtBox.setDepth(1000);
 
     thoughtText = this.add.text(400, 300, "Archived thought appears here.", {
         fontSize: "14px",
@@ -137,6 +139,10 @@ function create() {
     }).setOrigin(0.5);
 
     thoughtText.setVisible(false);
+    thoughtText.setDepth(1001);
+
+    let savedThought = localStorage.getItem("lastThought");
+    console.log(savedThought);
 
     player.on("pointerdown", () => {
         thoughtVisible = !thoughtVisible;
@@ -144,16 +150,15 @@ function create() {
         thoughtBox.setVisible(thoughtVisible);
         thoughtText.setVisible(thoughtVisible);
 
-        thoughtText.setText("I thought deleting everything would make me disappear.");
+        let savedThought = localStorage.getItem("lastThought");
+
+        if (savedThought) {
+            thoughtText.setText("Archived thought:\n" + savedThought);
+        } else {
+            thoughtText.setText("No archived thought found.");
+        }
     });
 
-    let savedThought = localStorage.getItem("lastThought");
-
-    if (savedThought) {
-        console.log("Loaded thought:", savedThought);
-    } else {
-        console.log("No saved thought");
-    }
 
     this.physics.add.overlap(player, files, collectFile, null, this);
 
