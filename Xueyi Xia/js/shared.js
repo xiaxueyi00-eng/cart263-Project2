@@ -188,8 +188,7 @@ function animate() {
     if (balls.length > 0 && centerModel) {
 
         let centerX = centerModel.position.x;
-        let centerY = centerModel.position.y;
-        let centerZ = centerModel.position.z;
+
 
         for (let i = 0; i < balls.length; i++) {
 
