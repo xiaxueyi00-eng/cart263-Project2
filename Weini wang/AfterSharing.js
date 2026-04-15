@@ -33,7 +33,8 @@ let files;
 let fakeFiles;
 let fakeCount = 0;
 let fakeText;
-let remainingTraces = 10;
+let timerText;
+let timerLeft = 30;
 let deletedTraces = 0;
 let remainingText;
 let lostText;
@@ -116,19 +117,19 @@ function create() {
         spawnTrace();
     }
 
-    remainingText = this.add.text(100, 20, "Remaining Traces: 10", {
+    timerText = this.add.text(565, 20, "Uploading In 0:30", {
         fontSize: "12px",
-        color: "#ff0000",
+        color: "#ffffff",
         fontFamily: "'Space Mono'"
     });
 
-    deletedText = this.add.text(100, 40, "Deleted Remnants: 0", {
+    deletedText = this.add.text(100, 20, "Deleted Remnants: 0", {
         fontSize: "12px",
         color: "#00f13c",
         fontFamily: "'Space Mono'"
     });
 
-    fakeText = this.add.text(580, 20, "Upload Decoy: 0", {
+    fakeText = this.add.text(100, 40, "Upload Decoy: 0", {
         fontSize: "12px",
         color: "#00f13c",
         fontFamily: "'Space Mono'"
@@ -337,7 +338,7 @@ function collectFile(player, file) {
         onComplete: () => file.destroy()
     });
 
-    remainingTraces--;
+    // remainingTraces--;
     deletedTraces++;
 
     if (deletedTraces === 5) {
@@ -399,7 +400,7 @@ function hitRobot(player, robot) {
     if (deletedTraces > 0) {
 
         deletedTraces--;
-        remainingTraces++;
+        // remainingTraces++;
         spawnTrace();
         updateScoreText();
 
@@ -449,9 +450,8 @@ function hitRobot(player, robot) {
 }
 
 function updateScoreText() {
-    remainingText.setText("Remaining Traces:" + remainingTraces);
+    // remainingText.setText("Remaining Traces:" + remainingTraces);
     deletedText.setText("Deleted Remnants: " + deletedTraces);
-
 }
 
 function moveRobot(robot) {
