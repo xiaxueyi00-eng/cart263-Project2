@@ -3,23 +3,22 @@ body {
     overflow: hidden;
 }
 
-/* ===== CANVAS BACKGROUND ===== */
+/* stars background */
 #stars {
     position: fixed;
     inset: 0;
     z-index: 0;
     pointer-events: none;
-
 }
 
+/* three.js canvas */
 #three {
     position: fixed;
     inset: 0;
     z-index: 1;
-    pointer-events: auto;
 }
 
-/* ===== MENU ===== */
+/* menu */
 #menu {
     position: fixed;
     top: 50%;
@@ -32,31 +31,27 @@ body {
 
     min-width: 240px;
     padding: 26px;
-
     border-radius: 18px;
 
     z-index: 10;
+
     opacity: 0;
     pointer-events: none;
 
-
     transition: all 0.4s ease;
-
-    z-index: 999;
 }
 
-
+/* visible state */
 #menu.show {
     opacity: 1;
     pointer-events: auto;
     transform: translate(-50%, -50%) scale(1);
 }
 
-/* ===== LINKS ===== */
+/* links */
 #menu a {
     color: white;
     text-decoration: none;
-
     padding: 10px 12px;
     border-radius: 10px;
 
@@ -64,18 +59,9 @@ body {
     transform: translateY(10px);
 
     transition: all 0.3s ease;
-
-    display: block;
 }
 
-/* hover */
 #menu a:hover {
     background: rgba(255, 255, 255, 0.08);
     transform: translateX(6px);
-    box-shadow: 0 0 12px rgba(255, 255, 255, 0.15);
-}
-
-#three {
-    pointer-events: auto;
-    z-index: 1;
 }
