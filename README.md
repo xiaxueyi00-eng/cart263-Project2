@@ -2,7 +2,7 @@
 Cart 263 project II
 - Team work : Xueyi Xia, Weini Wang
 - github live link：https://github.com/xiaxueyi00-eng/cart263-Project2
-- github repositories link：
+- github repositories link：https://xiaxueyi00-eng.github.io/cart263-Project2/
 
 # Interactive Web Project
 Project Overview
@@ -30,3 +30,15 @@ Project Overview
 
 
 # References:
+
+Lund, Jonas. We See In Every Direction (2013).
+https://jonaslund.com/works/we-see-in-every-direction/
+
+Zuboff, S. (2019). 
+The age of surveillance capitalism: The fight for a human future at the new frontier of power. PublicAffairs.
+https://shoshanazuboff.com/book/
+
+Gillespie, T. (2014). 
+The relevance of algorithms. In T. Gillespie, P. J. Boczkowski, & K. A. Foot (Eds.), Media technologies: Essays on communication, materiality, and society (pp. 167–193). MIT Press.
+ https://doi.org/10.7551/mitpress/9780262525374.003.0009
+
