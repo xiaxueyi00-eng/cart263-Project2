@@ -55,7 +55,7 @@ let gameEnded = false;
 let endingBox;
 let endingText;
 let endingTitle;
-let nextPage = "fianl.html";
+let nextPage = "final.html";
 
 function preload() {
     this.load.spritesheet("player", "image/16x32 Walk1.png", {
@@ -412,11 +412,6 @@ function update() {
                 robot.targetFake = null;
             }
         }
-        if (robot.body.velocity.x < 0) {
-            robot.setFlipX(true);
-        } else if (robot.body.velocity.x > 0) {
-            robot.setFlipX(false);
-        }
 
         if (robot.body.velocity.length() < 5) {
             robot.anims.stop();
@@ -498,7 +493,6 @@ function hitRobot(player, robot) {
     if (deletedTraces > 0) {
 
         deletedTraces--;
-        spawnTrace();
         updateScoreText();
 
         let lostText = this.add.text(player.x, player.y - 20, "COLLECTED -1", {
@@ -516,6 +510,8 @@ function hitRobot(player, robot) {
             onComplete: () => lostText.destroy()
         });
     }
+
+    spawnTrace();
 
     player.setTint(0xff0000);
 
@@ -553,6 +549,11 @@ function moveRobot(robot) {
         return;
     }
 
+    let minX = 140;
+    let maxX = 660;
+    let minY = 140;
+    let maxY = 460;
+
     let isStop = Phaser.Math.Between(0, 10) > 8;
 
     if (isStop) {
@@ -561,6 +562,23 @@ function moveRobot(robot) {
     } else {
 
         let angle = Phaser.Math.Between(0, 360);
+
+        if (robot.x <= minX) {
+            angle = Phaser.Math.Between(-60, 60);
+        }
+        else if (robot.x >= maxX) {
+            angle = Phaser.Math.Between(120, 240);
+        }
+        else if (robot.y <= minY) {
+            angle = Phaser.Math.Between(30, 150);
+        }
+        else if (robot.y >= maxY) {
+            angle = Phaser.Math.Between(210, 330);
+        }
+        else {
+            angle = Phaser.Math.Between(0, 360);
+        }
+
         let speed = Phaser.Math.Between(100, 200) + robotSpeedBoost;
 
         this.physics.velocityFromAngle(angle, speed, robot.body.velocity);
