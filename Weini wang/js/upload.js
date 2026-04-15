@@ -55,7 +55,7 @@ let gameEnded = false;
 let endingBox;
 let endingText;
 let endingTitle;
-let nextPage = "final.html";
+let nextPage = "world.html";
 
 function preload() {
     this.load.spritesheet("player", "image/16x32 Walk1.png", {

@@ -493,7 +493,7 @@ function animate() {
 
             //jump to next page
             setTimeout(() => {
-                window.location.href = "AfterSharing.html";
+                window.location.href = "upload.html";
             }, 800);
         }
     }
