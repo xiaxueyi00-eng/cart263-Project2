@@ -39,6 +39,7 @@ let hitCooldown = false;
 let exitDoor;
 let doorOpen = false
 let warningText;
+let warningBox;
 let thoughtBox;
 let thoughtText;
 let thoughtVisible = false;
@@ -122,8 +123,13 @@ function create() {
         fontFamily: "'Space Mono'",
     }).setOrigin(0.5);
 
+    warningBox = this.add.rectangle(400, 80, 300, 40, 0x000000);
+    warningBox.setStrokeStyle(1, 0xffffff);
+    warningBox.setVisible(false);
+    warningBox.setDepth(1000);
+
     warningText.setVisible(false);
-    warningText.setDepth(1000);
+    warningText.setDepth(1001);
 
     thoughtBox = this.add.rectangle(400, 300, 420, 120, 0x000000);
     thoughtBox.setStrokeStyle(1, 0xffffff);
@@ -266,7 +272,15 @@ function update() {
 }
 
 function collectFile(player, file) {
-    file.destroy();
+    file.disableBody(true, false);
+
+    this.tweens.add({
+        targets: file,
+        alpha: 0,
+        scale: 0,
+        duration: 200,
+        onComplete: () => file.destroy()
+    });
 
     remainingTraces--;
     deletedTraces++;
@@ -283,6 +297,7 @@ function spawnTrace() {
     );
 
     file.setScale(0.3);
+
 }
 
 function hitRobot(player, robot) {
@@ -301,9 +316,10 @@ function hitRobot(player, robot) {
 
     warningText.setText("YOU ARE TRACED");
     warningText.setVisible(true);
+    warningBox.setVisible(true);
 
     this.tweens.add({
-        targets: warningText,
+        targets: [warningText, warningBox],
         x: '+=5',
         duration: 50,
         yoyo: true,
@@ -312,11 +328,11 @@ function hitRobot(player, robot) {
 
     this.time.delayedCall(3000, () => {
         warningText.setVisible(false);
+        warningBox.setVisible(false);
     });
 
     this.time.delayedCall(3000, () => {
         hitCooldown = false;
-
         player.clearTint();
         player.body.allowGravity = true;
 
