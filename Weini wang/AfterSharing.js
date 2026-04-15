@@ -3,7 +3,7 @@ const config = {
     width: 800,
     height: 600,
     parent: "game-container",
-    backgroundColor: "#d1d1d1",
+    backgroundColor: "#0c0c0e",
 
     scale: {
         mode: Phaser.Scale.FIT,
@@ -29,6 +29,10 @@ const game = new Phaser.Game(config);
 
 let player;
 let cursors;
+let files;
+let fileCount = 0;
+let fileText;
+
 
 function preload() {
     this.load.spritesheet("player", "image/16x32 Walk1.png", {
@@ -37,6 +41,8 @@ function preload() {
     });
 
     this.load.image("frame", "image/background.png");
+
+    this.load.image("trace", "image/trace.png");
 }
 
 function create() {
@@ -71,6 +77,30 @@ function create() {
     });
 
     cursors = this.input.keyboard.createCursorKeys();
+
+    files = this.physics.add.group();
+
+    for (let i = 0; i < 10; i++) {
+
+        let file = this.physics.add.image(
+            Phaser.Math.Between(80, 720),
+            Phaser.Math.Between(80, 520),
+            "trace"
+        );
+        file.setScale(0.3);
+        this.physics.add.existing(file);
+        files.add(file);
+    }
+
+    fileText = this.add.text(100, 20, "Deleted Traces: 0/10", {
+        fontSize: "12px",
+        color: "#ffffff",
+        fontFamily: "'Space Mono'",
+        align: "center"
+    });
+
+
+    this.physics.add.overlap(player, files, collectFile, null, this);
 
 }
 
@@ -112,4 +142,12 @@ function update() {
 
         player.anims.stop();
     }
+
 }
+
+function collectFile(player, file) {
+    file.destroy();
+    fileCount++;
+    fileText.setText("Deleted Traces: " + fileCount + " / 10");
+}
+
