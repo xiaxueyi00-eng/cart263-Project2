@@ -30,6 +30,9 @@ const game = new Phaser.Game(config);
 let player;
 let cursors;
 let files;
+let fakeFiles;
+let fakeCount = 0;
+let fakeText;
 let remainingTraces = 10;
 let deletedTraces = 0;
 let remainingText;
@@ -53,6 +56,7 @@ function preload() {
     this.load.image("frame", "image/background.png");
 
     this.load.image("trace", "image/trace.png");
+    this.load.image("fake", "image/fakefile.png")
 
     this.load.spritesheet("robots", "image/robots.png", {
         frameWidth: 16,
@@ -100,6 +104,7 @@ function create() {
     cursors = this.input.keyboard.createCursorKeys();
 
     files = this.physics.add.group();
+    fakeFiles = this.physics.add.group();
 
     for (let i = 0; i < 10; i++) {
         spawnTrace();
@@ -114,6 +119,12 @@ function create() {
     deletedText = this.add.text(560, 20, "Deleted Traces: 0", {
         fontSize: "12px",
         color: "#ffffff",
+        fontFamily: "'Space Mono'"
+    });
+
+    fakeText = this.add.text(320, 20, "Fake Traces: 0", {
+        fontSize: "12px",
+        color: "#ff6666",
         fontFamily: "'Space Mono'"
     });
 
@@ -272,6 +283,7 @@ function update() {
 }
 
 function collectFile(player, file) {
+
     file.disableBody(true, false);
 
     this.tweens.add({
@@ -285,6 +297,7 @@ function collectFile(player, file) {
     remainingTraces--;
     deletedTraces++;
 
+    spawnFakeTrace(Phaser.Math.Between(80, 720), Phaser.Math.Between(80, 520));
     updateScoreText();
 
 }
@@ -298,6 +311,14 @@ function spawnTrace() {
 
     file.setScale(0.3);
 
+}
+
+function spawnFakeTrace(x, y) {
+    let fake = fakeFiles.create(x, y, "fake");
+    fake.setScale(0.3);
+
+    fakeCount++;
+    fakeText.setText("Fake Traces: " + fakeCount);
 }
 
 function hitRobot(player, robot) {
@@ -314,7 +335,7 @@ function hitRobot(player, robot) {
 
     player.setTint(0xff0000);
 
-    warningText.setText("YOU ARE TRACED");
+    warningText.setText("TRACE DETECTED");
     warningText.setVisible(true);
     warningBox.setVisible(true);
 
@@ -344,6 +365,7 @@ function hitRobot(player, robot) {
 function updateScoreText() {
     remainingText.setText("Remaining Traces: " + remainingTraces);
     deletedText.setText("Deleted Traces: " + deletedTraces);
+
 }
 
 function moveRobot(robot) {
