@@ -1,0 +1,62 @@
+ body {
+     margin: 0;
+ }
+
+ canvas {
+     display: block;
+     width: 100vw;
+     height: 100vh;
+ }
+
+ #inputOverlay {
+     position: fixed;
+     top: 80%;
+     left: 50%;
+     transform: translate(-50%, -50%);
+     z-index: 20;
+     display: none;
+     text-align: center;
+ }
+
+ #inputPrompt {
+     color: white;
+     font-size: 24px;
+     margin-bottom: 12px;
+     letter-spacing: 1px;
+ }
+
+ #thoughtInput {
+     width: 320px;
+     padding: 12px 16px;
+     font-size: 18px;
+     color: white;
+     background: rgba(0, 0, 0, 0.7);
+     border: 1px solid #8fdfff;
+     outline: none;
+     font-family: "Space Mono", monospace;
+
+ }
+
+ .space-mono-regular {
+     font-family: "Space Mono", monospace;
+     font-weight: 400;
+     font-style: normal;
+ }
+
+ .space-mono-bold {
+     font-family: "Space Mono", monospace;
+     font-weight: 700;
+     font-style: normal;
+ }
+
+ .space-mono-regular-italic {
+     font-family: "Space Mono", monospace;
+     font-weight: 400;
+     font-style: italic;
+ }
+
+ .space-mono-bold-italic {
+     font-family: "Space Mono", monospace;
+     font-weight: 700;
+     font-style: italic;
+ }
