@@ -41,6 +41,7 @@ let doorOpen = false
 let warningText;
 let thoughtBox;
 let thoughtText;
+let thoughtVisible = false;
 
 function preload() {
     this.load.spritesheet("player", "image/16x32 Walk1.png", {
@@ -138,10 +139,21 @@ function create() {
     thoughtText.setVisible(false);
 
     player.on("pointerdown", () => {
-        thoughtBox.setVisible(true);
-        thoughtText.setVisible(true);
+        thoughtVisible = !thoughtVisible;
+
+        thoughtBox.setVisible(thoughtVisible);
+        thoughtText.setVisible(thoughtVisible);
+
         thoughtText.setText("I thought deleting everything would make me disappear.");
     });
+
+    let savedThought = localStorage.getItem("lastThought");
+
+    if (savedThought) {
+        console.log("Loaded thought:", savedThought);
+    } else {
+        console.log("No saved thought");
+    }
 
     this.physics.add.overlap(player, files, collectFile, null, this);
 

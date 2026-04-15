@@ -308,6 +308,9 @@ thoughtInput.addEventListener('keydown', (event) => {
 
         if (!text || !selectedNode) return;
 
+        //save the input in to local storage
+        localStorage.setItem('lastThought', text);
+
         inputOverlay.style.display = 'none';
         thoughtInput.value = '';
 
