@@ -57,8 +57,8 @@ function preload() {
     });
 
     this.load.spritesheet("door", "image/door.png", {
-        frameWidth: 55,
-        frameHeight: 48
+        frameWidth: 50,
+        frameHeight: 50
     });
 }
 
@@ -156,13 +156,13 @@ function create() {
         key: "doorOpen",
         frames: this.anims.generateFrameNumbers("door", {
             start: 0,
-            end: 13
+            end: 12
         }),
         frameRate: 12,
         repeat: -1
     });
 
-    exitDoor = this.physics.add.sprite(500, 520, "door");
+    exitDoor = this.physics.add.sprite(400, 500, "door");
     exitDoor.anims.play("doorOpen", true);
 
 }
