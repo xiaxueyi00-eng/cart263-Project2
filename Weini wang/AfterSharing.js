@@ -37,8 +37,6 @@ let deletedText;
 let robots;
 let hitCooldown = false;
 
-
-
 function preload() {
     this.load.spritesheet("player", "image/16x32 Walk1.png", {
         frameWidth: 16,
@@ -94,13 +92,13 @@ function create() {
         spawnTrace();
     }
 
-    remainingText = this.add.text(20, 20, "Remaining Traces: 10", {
+    remainingText = this.add.text(100, 20, "Remaining Traces: 10", {
         fontSize: "12px",
         color: "#ffffff",
         fontFamily: "'Space Mono'"
     });
 
-    deletedText = this.add.text(20, 40, "Deleted Traces: 0", {
+    deletedText = this.add.text(560, 20, "Deleted Traces: 0", {
         fontSize: "12px",
         color: "#ffffff",
         fontFamily: "'Space Mono'"
@@ -129,15 +127,9 @@ function create() {
         robot.setScale(2);
         robot.anims.play("robotWalk", true);
         robot.body.setCollideWorldBounds(true);
-        robot.body.setBounce(1, 1);
+        robot.body.setBounce(0.2);
 
-        let speedX = Phaser.Math.Between(-100, 100);
-        let speedY = Phaser.Math.Between(-100, 100);
-
-        if (speedX === 0) speedX = 50;
-        if (speedY === 0) speedY = -50;
-
-        robot.body.setVelocity(speedX, speedY);
+        moveRobot.call(this, robot);
 
     }
 
@@ -195,8 +187,12 @@ function update() {
             robot.setFlipX(false);
         }
 
+        if (robot.body.velocity.length() < 5) {
+            robot.anims.stop();
+        } else {
+            robot.anims.play("robotWalk", true);
+        }
     });
-
 
 }
 
@@ -249,4 +245,26 @@ function hitRobot(player, robot) {
 function updateScoreText() {
     remainingText.setText("Remaining Traces: " + remainingTraces);
     deletedText.setText("Deleted Traces: " + deletedTraces);
+}
+
+function moveRobot(robot) {
+
+    let isStop = Phaser.Math.Between(0, 10) > 8;
+
+    if (isStop) {
+        robot.body.setVelocity(0, 0);
+        robot.anims.stop();
+    } else {
+
+        let angle = Phaser.Math.Between(0, 360);
+        let speed = Phaser.Math.Between(100, 200);
+
+        this.physics.velocityFromAngle(angle, speed, robot.body.velocity);
+        robot.anims.play("robotWalk", true);
+    }
+
+
+    this.time.delayedCall(Phaser.Math.Between(1000, 3000), () => {
+        moveRobot.call(this, robot);
+    });
 }
