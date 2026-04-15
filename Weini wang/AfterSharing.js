@@ -41,6 +41,7 @@ let deletedText;
 let robots;
 let hunterRobot;
 let hitCooldown = false;
+let playerInvincible = true;
 let exitDoor;
 let doorOpen = false
 let warningText;
@@ -48,6 +49,8 @@ let warningBox;
 let thoughtBox;
 let thoughtText;
 let thoughtVisible = false;
+
+
 
 function preload() {
     this.load.spritesheet("player", "image/16x32 Walk1.png", {
@@ -114,19 +117,19 @@ function create() {
 
     remainingText = this.add.text(100, 20, "Remaining Traces: 10", {
         fontSize: "12px",
-        color: "#ffffff",
+        color: "#ff0000",
         fontFamily: "'Space Mono'"
     });
 
-    deletedText = this.add.text(560, 20, "Deleted Traces: 0", {
+    deletedText = this.add.text(100, 40, "Deleted Remnants: 0", {
         fontSize: "12px",
-        color: "#ffffff",
+        color: "#00f13c",
         fontFamily: "'Space Mono'"
     });
 
-    fakeText = this.add.text(320, 20, "Fake Traces: 0", {
+    fakeText = this.add.text(580, 20, "Upload Decoy: 0", {
         fontSize: "12px",
-        color: "#ff6666",
+        color: "#00f13c",
         fontFamily: "'Space Mono'"
     });
 
@@ -228,6 +231,10 @@ function create() {
 
     exitDoor = this.physics.add.sprite(400, 500, "door");
     exitDoor.anims.play("doorOpen", true);
+
+    this.time.delayedCall(2000, () => {
+        playerInvincible = false;
+    });
 
 }
 
@@ -353,11 +360,11 @@ function spawnFakeTrace(x, y) {
     fake.setScale(0.3);
 
     fakeCount++;
-    fakeText.setText("Fake Traces: " + fakeCount);
+    fakeText.setText("Upload Decoy: " + fakeCount);
 }
 
 function hitRobot(player, robot) {
-    if (hitCooldown) return;
+    if (hitCooldown || playerInvincible) return;
 
     hitCooldown = true;
 
@@ -417,8 +424,8 @@ function hitRobot(player, robot) {
 }
 
 function updateScoreText() {
-    remainingText.setText("Yellow Left: " + remainingTraces);
-    deletedText.setText("Collected: " + deletedTraces);
+    remainingText.setText("Remaining Traces:" + remainingTraces);
+    deletedText.setText("Deleted Remnants: " + deletedTraces);
 
 }
 
