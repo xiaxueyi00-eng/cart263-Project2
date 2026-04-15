@@ -36,6 +36,10 @@ let remainingText;
 let deletedText;
 let robots;
 let hitCooldown = false;
+// let exitDoor;
+// let doorOpen = false
+
+let warningText;
 
 function preload() {
     this.load.spritesheet("player", "image/16x32 Walk1.png", {
@@ -103,6 +107,14 @@ function create() {
         color: "#ffffff",
         fontFamily: "'Space Mono'"
     });
+
+    warningText = this.add.text(400, 80, "", {
+        fontSize: "20px",
+        color: "#ff5555",
+        fontFamily: "'Space Mono'",
+    }).setOrigin(0.5);
+
+    warningText.setVisible(false);
 
     this.physics.add.overlap(player, files, collectFile, null, this);
 
@@ -233,6 +245,21 @@ function hitRobot(player, robot) {
 
     player.setTint(0xff0000);
 
+    warningText.setText("YOU ARE TRACED");
+    warningText.setVisible(true);
+
+    this.tweens.add({
+        targets: warningText,
+        x: '+=5',
+        duration: 50,
+        yoyo: true,
+        repeat: 5
+    });
+
+    this.time.delayedCall(3000, () => {
+        warningText.setVisible(false);
+    });
+
     this.time.delayedCall(3000, () => {
         hitCooldown = false;
 
@@ -240,6 +267,8 @@ function hitRobot(player, robot) {
         player.body.allowGravity = true;
 
     });
+
+
 }
 
 function updateScoreText() {
