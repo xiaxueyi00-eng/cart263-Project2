@@ -38,8 +38,9 @@ let robots;
 let hitCooldown = false;
 let exitDoor;
 let doorOpen = false
-
 let warningText;
+let thoughtBox;
+let thoughtText;
 
 function preload() {
     this.load.spritesheet("player", "image/16x32 Walk1.png", {
@@ -68,6 +69,7 @@ function create() {
 
     player = this.physics.add.sprite(100, 300, "player");
     player.setScale(2);
+    player.setInteractive();
 
     this.physics.world.setBounds(0, 0, 800, 600);
     player.setCollideWorldBounds(true);
@@ -120,6 +122,26 @@ function create() {
     }).setOrigin(0.5);
 
     warningText.setVisible(false);
+
+    thoughtBox = this.add.rectangle(400, 300, 420, 120, 0x000000, 0.8);
+    thoughtBox.setStrokeStyle(1, 0xffffff);
+    thoughtBox.setVisible(false);
+
+    thoughtText = this.add.text(400, 300, "Archived thought appears here.", {
+        fontSize: "14px",
+        color: "#ffffff",
+        fontFamily: "'Space Mono'",
+        align: "center",
+        wordWrap: { width: 360 }
+    }).setOrigin(0.5);
+
+    thoughtText.setVisible(false);
+
+    player.on("pointerdown", () => {
+        thoughtBox.setVisible(true);
+        thoughtText.setVisible(true);
+        thoughtText.setText("I thought deleting everything would make me disappear.");
+    });
 
     this.physics.add.overlap(player, files, collectFile, null, this);
 
