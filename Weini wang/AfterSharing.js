@@ -39,6 +39,7 @@ let remainingText;
 let lostText;
 let deletedText;
 let robots;
+let robotSpeedBoost = 0;
 let hunterRobot;
 let hitCooldown = false;
 let playerInvincible = true;
@@ -299,7 +300,7 @@ function update() {
                     robot.targetFake.y
                 );
 
-                let speed = 90;
+                let speed = 90 + robotSpeedBoost;
 
                 robot.setVelocity(
                     Math.cos(angle) * speed,
@@ -338,6 +339,30 @@ function collectFile(player, file) {
 
     remainingTraces--;
     deletedTraces++;
+
+    if (deletedTraces === 5) {
+        robotSpeedBoost = 80;
+
+        let alertText = this.add.text(400, 550, "SURVEILLANCE INCREASED", {
+            fontSize: "18px",
+            color: "#fc0000",
+            fontFamily: "'Space Mono'"
+        }).setOrigin(0.5);
+
+        alertText.setDepth(1001);
+
+        this.tweens.add({
+            targets: alertText,
+            alpha: 0,
+            duration: 100,
+            yoyo: true,
+            repeat: 6
+        });
+
+        this.time.delayedCall(1200, () => {
+            alertText.destroy();
+        });
+    }
 
     spawnFakeTrace(Phaser.Math.Between(80, 720), Phaser.Math.Between(80, 520));
     updateScoreText();
@@ -439,7 +464,7 @@ function moveRobot(robot) {
     } else {
 
         let angle = Phaser.Math.Between(0, 360);
-        let speed = Phaser.Math.Between(100, 200);
+        let speed = Phaser.Math.Between(100, 200) + robotSpeedBoost;
 
         this.physics.velocityFromAngle(angle, speed, robot.body.velocity);
         robot.anims.play("robotWalk", true);
