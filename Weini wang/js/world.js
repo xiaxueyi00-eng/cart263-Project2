@@ -105,23 +105,22 @@ let model = null;      // store loaded model
 let exploded = false;  // state: whether animation is triggered
 
 
-loader.load(
-    "image/earth.glb",
-    (gltf) => {
-        model = gltf.scene;
+loader.load("image/earth.glb", (gltf) => {
+    model = gltf.scene;
 
-        // Scale model down
-        model.scale.set(0.1, 0.1, 0.1);
+    const finalScale = 0.1;
 
-        // Center model geometry
-        const box = new THREE.Box3().setFromObject(model);
-        const center = box.getCenter(new THREE.Vector3());
-        model.position.sub(center);
+    model.scale.set(0.001, 0.001, 0.001);
 
-        // Add model to scene
-        scene.add(model);
-    }
-);
+    const box = new THREE.Box3().setFromObject(model);
+    const center = box.getCenter(new THREE.Vector3());
+    model.position.sub(center);
+
+    scene.add(model);
+
+    model.userData.finalScale = finalScale;
+    model.userData.growing = true;
+});
 
 // ===== INTERACTION =====
 window.addEventListener("mousemove", function () {
