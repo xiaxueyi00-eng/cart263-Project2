@@ -28,13 +28,14 @@ const config = {
 const game = new Phaser.Game(config);
 
 let player;
+let playerMarker;
 let cursors;
 let files;
 let fakeFiles;
 let fakeCount = 0;
 let fakeText;
 let timerText;
-let timeLeft = 30;
+let timeLeft = 5;
 let deletedTraces = 0;
 let remainingText;
 let lostText;
@@ -51,6 +52,7 @@ let warningBox;
 let thoughtBox;
 let thoughtText;
 let thoughtVisible = false;
+let exitText
 let gameEnded = false;
 let goalReached = false;
 
@@ -81,9 +83,29 @@ function create() {
 
     const frame = this.add.image(400, 300, "frame");
 
-    player = this.physics.add.sprite(100, 300, "player");
+    player = this.physics.add.sprite(400, 300, "player");
     player.setScale(2);
     player.setInteractive();
+
+    playerMarker = this.add.triangle(
+        player.x,
+        player.y - 30,
+        0, 0,
+        20, 0,
+        10, 20,
+        0xff0000,
+    ).setOrigin(0.5);
+
+    playerMarker.setScale(0.5);
+    playerMarker.setDepth(1001);
+
+    this.tweens.add({
+        targets: playerMarker,
+        alpha: 0.2,
+        duration: 300,
+        yoyo: true,
+        repeat: -1
+    });
 
     this.physics.world.setBounds(0, 0, 800, 600);
     player.setCollideWorldBounds(true);
@@ -259,9 +281,22 @@ function create() {
                 exitDoor.body.enable = true;
                 exitDoor.anims.play("doorOpen", true);
 
-                warningText.setText("UPLOAD GATE OPEN");
-                warningText.setVisible(true);
-                warningBox.setVisible(true);
+                let exitText = this.add.text(400, 530, "UPLOAD GATE OPEN", {
+                    fontSize: "12px",
+                    color: "#00f13c",
+                    fontFamily: "'Space Mono'"
+                }).setOrigin(0.5);
+
+                this.tweens.add({
+                    targets: exitText,
+                    alpha: 0,
+                    duration: 1000,
+                    yoyo: true,
+                    repeat: 1000
+                });
+
+
+                exitText.setDepth(1001);
             }
         }
     });
@@ -272,6 +307,9 @@ function create() {
 
 function update() {
     player.body.setVelocity(0);
+
+    playerMarker.x = player.x;
+    playerMarker.y = player.y - 30;
 
     if (hitCooldown) {
         return;
