@@ -51,8 +51,8 @@ let warningBox;
 let thoughtBox;
 let thoughtText;
 let thoughtVisible = false;
-
-
+let gameEnded = false;
+let goalReached = false;
 
 
 function preload() {
@@ -124,7 +124,7 @@ function create() {
         fontFamily: "'Space Mono'"
     });
 
-    deletedText = this.add.text(100, 20, "Deleted Remnants: 0", {
+    deletedText = this.add.text(100, 20, "Deleted Remnants: 0 / 15", {
         fontSize: "12px",
         color: "#00f13c",
         fontFamily: "'Space Mono'"
@@ -233,7 +233,6 @@ function create() {
     });
 
     exitDoor = this.physics.add.sprite(400, 500, "door");
-    exitDoor.anims.play("doorOpen", true);
     exitDoor.setVisible(false);
     exitDoor.body.enable = false;
 
@@ -245,12 +244,30 @@ function create() {
         delay: 1000,
         repeat: 29,
         callback: () => {
+            if (doorOpen || gameEnded) return;
 
             timeLeft--;
             timerText.setText("Uploading In 0:" + timeLeft);
 
+            if (timeLeft <= 0) {
+                doorOpen = true;
+                robots.clear(true, true);
+                files.clear(true, true);
+                fakeFiles.clear(true, true);
+
+                exitDoor.setVisible(true);
+                exitDoor.body.enable = true;
+                exitDoor.anims.play("doorOpen", true);
+
+                warningText.setText("UPLOAD GATE OPEN");
+                warningText.setVisible(true);
+                warningBox.setVisible(true);
+            }
         }
     });
+
+
+
 }
 
 function update() {
@@ -380,7 +397,6 @@ function collectFile(player, file) {
     spawnFakeTrace(Phaser.Math.Between(80, 720), Phaser.Math.Between(80, 520));
     updateScoreText();
 
-
 }
 
 function spawnTrace() {
@@ -398,8 +414,6 @@ function spawnFakeTrace(x, y) {
     let fake = fakeFiles.create(x, y, "fake");
     fake.setScale(0.3);
 
-    fakeCount++;
-    fakeText.setText("Upload Decoy: " + fakeCount);
 }
 
 function hitRobot(player, robot) {
@@ -446,12 +460,10 @@ function hitRobot(player, robot) {
         repeat: 5
     });
 
+
     this.time.delayedCall(3000, () => {
         warningText.setVisible(false);
         warningBox.setVisible(false);
-    });
-
-    this.time.delayedCall(3000, () => {
         hitCooldown = false;
         player.clearTint();
         player.body.allowGravity = true;
@@ -462,11 +474,14 @@ function hitRobot(player, robot) {
 }
 
 function updateScoreText() {
-    // remainingText.setText("Remaining Traces:" + remainingTraces);
-    deletedText.setText("Deleted Remnants: " + deletedTraces);
+    deletedText.setText("Deleted Remnants: " + deletedTraces + "/ 15");
 }
 
 function moveRobot(robot) {
+
+    if (!robot || !robot.body || !robot.active) {
+        return;
+    }
 
     let isStop = Phaser.Math.Between(0, 10) > 8;
 
@@ -484,7 +499,9 @@ function moveRobot(robot) {
 
 
     this.time.delayedCall(Phaser.Math.Between(1000, 3000), () => {
-        moveRobot.call(this, robot);
+        if (!doorOpen && robot && robot.body && robot.active) {
+            moveRobot.call(this, robot);
+        }
     });
 }
 
@@ -502,7 +519,7 @@ function robotEatFake(robot, fake) {
         onComplete: () => fake.destroy()
     });
 
-    fakeCount--;
+    fakeCount++;
     fakeText.setText("Fake Traces: " + fakeCount);
 
     robot.setTint(0xff4444);
