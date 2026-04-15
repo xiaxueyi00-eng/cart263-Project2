@@ -119,15 +119,7 @@ loader.load("image/earth.glb", (gltf) => {
     scene.add(model);
 
     model.userData.finalScale = finalScale;
-    model.userData.growing = true;
-});
-
-// ===== INTERACTION =====
-window.addEventListener("mousemove", function () {
-
-    if (model && exploded === false) {
-        model.scale.set(0.11, 0.11, 0.11);
-    }
+    model.userData.growing = false;
 });
 
 /* =========================
@@ -137,85 +129,35 @@ function animate() {
 
     requestAnimationFrame(animate);
 
-    if (model && exploded === false) {
-        model.rotation.y = model.rotation.y + 0.002;
+    if (model) {
+        model.rotation.y += 0.002;
     }
 
-    if (model && exploded === true) {
+    if (model && model.userData.growing) {
+        const target = model.userData.finalScale;
 
-        model.scale.multiplyScalar(0.98);
+        model.scale.x += (target - model.scale.x) * 0.06;
+        model.scale.y += (target - model.scale.y) * 0.06;
+        model.scale.z += (target - model.scale.z) * 0.06;
 
-        camera.position.z = camera.position.z * 0.99;
+        if (Math.abs(target - model.scale.x) < 0.001) {
+            model.scale.set(target, target, target);
+            model.userData.growing = false;
+        }
     }
-
     controls.update();
 
     renderer.render(scene, camera);
 }
 
 animate();
-/* =========================
-   CLICK EVENT (TRIGGER MENU)
-========================= */
 
-// Click model/canvas to trigger "explosion + UI reveal"
-renderer.domElement.addEventListener("pointerdown", function () {
-
-    // If model is not loaded, stop running
+window.addEventListener("click", function () {
     if (model == null) {
         return;
     }
 
-    // =========================
-    // 1. Set state
-    // =========================
-    exploded = true;
-
-    // =========================
-    // 2. Get menu element
-    // =========================
-    var menu = document.getElementById("menu");
-
-    // =========================
-    // 3. Show menu (add CSS class)
-    // =========================
-    menu.classList.add("show");
-    document.body.classList.add("menu-open");
-
-    // =========================
-    // 4. Get all menu items (links)
-    // =========================
-    var items = menu.querySelectorAll("a");
-
-    // =========================
-    // 5. Wait before animation starts
-    // =========================
-    setTimeout(function () {
-
-        // =========================
-        // 6. Show items one by one
-        // =========================
-        for (var i = 0; i < items.length; i++) {
-
-            showItem(items[i], i);
-        }
-
-    }, 2000);
+    if (model.userData.growing === false) {
+        model.userData.growing = true;
+    }
 });
-
-
-// =========================
-// Helper function: show each menu item
-// =========================
-function showItem(item, index) {
-
-    setTimeout(function () {
-
-        // Make item visible
-        item.style.opacity = "1";
-
-        // Move item to normal position
-        item.style.transform = "translateY(0)";
-
-    }, index * 100);
-}
