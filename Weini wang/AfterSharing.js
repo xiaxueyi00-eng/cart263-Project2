@@ -36,8 +36,8 @@ let remainingText;
 let deletedText;
 let robots;
 let hitCooldown = false;
-// let exitDoor;
-// let doorOpen = false
+let exitDoor;
+let doorOpen = false
 
 let warningText;
 
@@ -54,6 +54,11 @@ function preload() {
     this.load.spritesheet("robots", "image/robots.png", {
         frameWidth: 16,
         frameHeight: 19
+    });
+
+    this.load.spritesheet("door", "image/door.png", {
+        frameWidth: 55,
+        frameHeight: 48
     });
 }
 
@@ -146,6 +151,20 @@ function create() {
     }
 
     this.physics.add.overlap(player, robots, hitRobot, null, this);
+
+    this.anims.create({
+        key: "doorOpen",
+        frames: this.anims.generateFrameNumbers("door", {
+            start: 0,
+            end: 13
+        }),
+        frameRate: 12,
+        repeat: -1
+    });
+
+    exitDoor = this.physics.add.sprite(500, 520, "door");
+    exitDoor.anims.play("doorOpen", true);
+
 }
 
 function update() {
@@ -216,9 +235,6 @@ function collectFile(player, file) {
 
     updateScoreText();
 
-    if (remainingTraces === 0 && !doorOpen) {
-        openExitDoor();
-    }
 }
 
 function spawnTrace() {
@@ -297,3 +313,4 @@ function moveRobot(robot) {
         moveRobot.call(this, robot);
     });
 }
+
