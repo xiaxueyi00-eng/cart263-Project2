@@ -35,10 +35,8 @@ let fakeFiles;
 let fakeCount = 0;
 let fakeText;
 let timerText;
-let timeLeft = 5;
+let timeLeft = 30;
 let deletedTraces = 0;
-let remainingText;
-let lostText;
 let deletedText;
 let robots;
 let robotSpeedBoost = 0;
@@ -54,8 +52,10 @@ let thoughtText;
 let thoughtVisible = false;
 let exitText
 let gameEnded = false;
-let goalReached = false;
-
+let endingBox;
+let endingText;
+let endingTitle;
+let nextPage = "fianl.html";
 
 function preload() {
     this.load.spritesheet("player", "image/16x32 Walk1.png", {
@@ -136,7 +136,7 @@ function create() {
     files = this.physics.add.group();
     fakeFiles = this.physics.add.group();
 
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 15; i++) {
         spawnTrace();
     }
 
@@ -188,10 +188,33 @@ function create() {
     thoughtText.setVisible(false);
     thoughtText.setDepth(1001);
 
-    let savedThought = localStorage.getItem("lastThought");
-    //console.log(savedThought);
+    endingTitle = this.add.text(400, 260, "", {
+        fontSize: "30px",
+        fontFamily: "'Space Mono'",
+    }).setOrigin(0.5);
+
+    endingTitle.setDepth(2001);
+    endingTitle.setVisible(false);
+
+    endingBox = this.add.rectangle(400, 300, 500, 180, 0x000000);
+    endingBox.setStrokeStyle(1, 0xffffff);
+    endingBox.setDepth(2000);
+    endingBox.setVisible(false);
+
+    endingText = this.add.text(400, 325, "", {
+        fontSize: "15px",
+        color: "#ffffff",
+        fontFamily: "'Space Mono'",
+        align: "center",
+        wordWrap: { width: 420 }
+    }).setOrigin(0.5);
+
+    endingText.setDepth(2001);
+    endingText.setVisible(false);
 
     player.on("pointerdown", () => {
+        if (gameEnded) return;
+
         thoughtVisible = !thoughtVisible;
 
         thoughtBox.setVisible(thoughtVisible);
@@ -222,8 +245,8 @@ function create() {
 
     for (let i = 0; i < 10; i++) {
         let robot = robots.create(
-            Phaser.Math.Between(80, 720),
-            Phaser.Math.Between(80, 520),
+            Phaser.Math.Between(140, 660),
+            Phaser.Math.Between(140, 460),
             "robots"
         );
         robot.setScale(2);
@@ -241,8 +264,6 @@ function create() {
 
     }
 
-    this.physics.add.overlap(player, robots, hitRobot, null, this);
-    this.physics.add.overlap(hunterRobot, fakeFiles, robotEatFake, null, this);
 
     this.anims.create({
         key: "doorOpen",
@@ -281,7 +302,7 @@ function create() {
                 exitDoor.body.enable = true;
                 exitDoor.anims.play("doorOpen", true);
 
-                let exitText = this.add.text(400, 530, "UPLOAD GATE OPEN", {
+                exitText = this.add.text(400, 530, "UPLOAD GATE OPEN", {
                     fontSize: "12px",
                     color: "#00f13c",
                     fontFamily: "'Space Mono'"
@@ -301,11 +322,23 @@ function create() {
         }
     });
 
+    this.physics.add.overlap(player, robots, hitRobot, null, this);
+    this.physics.add.overlap(hunterRobot, fakeFiles, robotEatFake, null, this);
+    this.physics.add.overlap(player, exitDoor, reachDoor, null, this);
 
-
+    this.input.on("pointerdown", () => {
+        if (gameEnded) {
+            window.location.href = nextPage;
+        }
+    });
 }
 
 function update() {
+    if (gameEnded) {
+        player.setVelocity(0);
+        return;
+    }
+
     player.body.setVelocity(0);
 
     playerMarker.x = player.x;
@@ -439,8 +472,8 @@ function collectFile(player, file) {
 
 function spawnTrace() {
     let file = files.create(
-        Phaser.Math.Between(80, 720),
-        Phaser.Math.Between(80, 520),
+        Phaser.Math.Between(140, 660),
+        Phaser.Math.Between(140, 460),
         "trace"
     );
 
@@ -508,7 +541,6 @@ function hitRobot(player, robot) {
 
     });
 
-
 }
 
 function updateScoreText() {
@@ -558,9 +590,54 @@ function robotEatFake(robot, fake) {
     });
 
     fakeCount++;
-    fakeText.setText("Fake Traces: " + fakeCount);
+    fakeText.setText("Upload Decoy: " + fakeCount);
 
     robot.setTint(0xff4444);
 
     robot.targetFake = null;
+}
+
+function reachDoor(player, door) {
+    if (!doorOpen || gameEnded) return;
+
+    gameEnded = true;
+
+    player.setVelocity(0, 0);
+    player.anims.stop();
+    player.body.enable = false;
+
+    if (playerMarker) {
+        playerMarker.setVisible(false);
+    }
+
+    endingBox.setVisible(true);
+    endingTitle.setVisible(true);
+    endingText.setVisible(true);
+
+    if (deletedTraces >= 15) {
+
+        endingTitle.setText("UPLOAD COMPLETE");
+        endingTitle.setColor("#00f13c");
+
+        endingBox.setStrokeStyle(2, 0x00f13c);
+
+        endingText.setText(
+            "Your thought slipped through unseen.\n" +
+            "The system fell into your trap\n" +
+            "and archived your false traces instead."
+        );
+
+    } else {
+
+        endingTitle.setText("UPLOAD COMPLETE");
+        endingTitle.setColor("#ff4444");
+
+        endingBox.setStrokeStyle(2, 0xff4444);
+
+        endingText.setText(
+            "Your thought was uploaded.\n" +
+            "Your traces followed behind it.\n" +
+            "The system kept everything."
+        );
+    }
 }
