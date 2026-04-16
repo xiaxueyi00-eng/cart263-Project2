@@ -262,6 +262,10 @@ window.addEventListener('mousemove', (event) => {
 
 //add click event
 window.addEventListener('click', () => {
+
+    //if absorbed do nothing
+    if (finalAbsorb) return;
+
     //set the ray from camera to mouse
     raycaster.setFromCamera(mouse, camera);
 
