@@ -110,21 +110,25 @@ const loader = new GLTFLoader();
 
 let model = null;      // store loaded model
 let moveToCorner = false;  // state: move the earth to corner
-let textShown = false;
-let clickCount = 0;
+let textShown = false; // state：final text 
+let clickCount = 0; // Count times the user clicks
 
 
 loader.load("image/earth.glb", (gltf) => {
     model = gltf.scene;
 
+    //target size 
     const finalScale = 0.1;
 
+    //set it start very small 
     model.scale.set(0.001, 0.001, 0.001);
 
+    //compute box to center the model
     const box = new THREE.Box3().setFromObject(model);
     const center = box.getCenter(new THREE.Vector3());
     model.position.sub(center);
 
+    //add model to the scene
     scene.add(model);
 
     model.userData.finalScale = finalScale;
@@ -137,35 +141,49 @@ loader.load("image/earth.glb", (gltf) => {
 ========================= */
 function animate() {
 
+    //keep the animation loop running
     requestAnimationFrame(animate);
 
+    //slowly rotate the earth model
     if (model) {
         model.rotation.y += 0.002;
     }
 
+    //if the model is in growing state
     if (model && model.userData.growing) {
+
+        //target final size
         const target = model.userData.finalScale;
 
         model.scale.x += (target - model.scale.x) * 0.03;
         model.scale.y += (target - model.scale.y) * 0.03;
         model.scale.z += (target - model.scale.z) * 0.03;
 
+        //stop growing
         if (Math.abs(target - model.scale.x) < 0.001) {
             model.scale.set(target, target, target);
+
+            //update state
             model.userData.growing = false;
             model.userData.fullSize = true;
         }
     }
 
+    //move to bottom-right
     if (model && moveToCorner) {
+
+        //scale down
         model.scale.x += (0.035 - model.scale.x) * 0.05;
         model.scale.y += (0.035 - model.scale.y) * 0.05;
         model.scale.z += (0.035 - model.scale.z) * 0.05;
 
+        //move towards target position
         model.position.x += (3 - model.position.x) * 0.05;
         model.position.y += (-1.3 - model.position.y) * 0.05;
         model.position.z += (0 - model.position.z) * 0.05;
     }
+
+    //update orbit controls 
     controls.update();
 
     renderer.render(scene, camera);
@@ -173,18 +191,23 @@ function animate() {
 
 animate();
 
+//listen for user click interactions
 window.addEventListener("click", function () {
+    //if model not loaded yet, do nothing
     if (model == null) return;
 
     clickCount++;
 
+    //click 1, start growing animation
     if (clickCount === 1) {
         model.userData.growing = true;
     }
 
+    //click 2, move earth to corner and show message
     else if (clickCount === 2) {
         moveToCorner = true;
 
+        //only show text once
         if (!textShown) {
             finalText.innerHTML = "CONNECTION DOES NOT MEAN CLOSENESS.";
             finalText.style.opacity = "1";
@@ -192,10 +215,13 @@ window.addEventListener("click", function () {
         }
     }
 
+    //click 3, back to homepage
     else if (clickCount === 3) {
         window.location.href = "../xueyi-xia/html/index.html";
     }
 });
+
+//add windows resize
 window.addEventListener('resize', () => {
     starCanvas.width = window.innerWidth;
     starCanvas.height = window.innerHeight;
