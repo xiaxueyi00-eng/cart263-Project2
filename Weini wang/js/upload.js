@@ -341,6 +341,44 @@ function create() {
 
     startOverlay = this.add.rectangle(400, 300, 800, 600, 0x000000, 0.7);
     startOverlay.setDepth(3000);
+
+    startBox = this.add.rectangle(400, 300, 460, 260, 0x000000);
+    startBox.setStrokeStyle(2, 0x727272);
+    startBox.setDepth(3001);
+
+    startTitle = this.add.text(400, 210, "UPLOAD PROTOCOL", {
+        fontSize: "26px",
+        color: "#f10000",
+        fontFamily: "'Space Mono'"
+    }).setOrigin(0.5);
+
+    startTitle.setDepth(3002);
+
+    startInstruction = this.add.text(400, 320,
+        "Use arrow keys to move\n\n" +
+        "Delete all 15 remnant\n" +
+        "Each deletion leaves a false decoy\n" +
+        "Click the character to inspect your thought\n" +
+        "Avoid detection\n" +
+        "Upload your thought safely!\n",
+        {
+            fontSize: "12px",
+            color: "#ffffff",
+            fontFamily: "'Space Mono'",
+            align: "center",
+            lineSpacing: 8
+        }
+    ).setOrigin(0.5);
+
+    startInstruction.setDepth(3002);
+
+    startHint = this.add.text(400, 400, "Click this box to begin", {
+        fontSize: "12px",
+        color: "#aaaaaa",
+        fontFamily: "'Space Mono'"
+    }).setOrigin(0.5);
+
+    startHint.setDepth(3002);
 }
 
 function update() {
