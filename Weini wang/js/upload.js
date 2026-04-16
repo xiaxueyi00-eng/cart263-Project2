@@ -277,6 +277,21 @@ function create() {
         }
     });
 
+    //click anywhere to close the thought box
+    this.input.on("pointerdown", (pointer, gameObjects) => {
+
+        //do nothing if thought box not open
+        if (!thoughtVisible) return;
+
+        //do nothing click player
+        if (gameObjects.includes(player)) return;
+
+        //close thought box
+        thoughtVisible = false;
+        thoughtBox.setVisible(false);
+        thoughtText.setVisible(false);
+    });
+
     //player overlaps with real files
     this.physics.add.overlap(player, files, collectFile, null, this);
 
