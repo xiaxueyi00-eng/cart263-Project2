@@ -132,13 +132,9 @@ loader.load("../image/ball.glb", (gltf) => {
 
         scene.add(b);
         balls.push(b);
-        // Optional metadata for interaction/expansion
-        if (i !== 0) {
-            b.userData.info = {
-                title: "Ball " + i,
-                desc: "This is a simple node."
-            };
-        }
+
+
+
     }
 });
 
@@ -195,23 +191,9 @@ function animate() {
 
     if (balls.length > 0 && centerModel) {
 
-        let centerX = centerModel.position.x;
-
-
         for (let i = 0; i < balls.length; i++) {
 
             let ball = balls[i];
-
-            // Generate random direction once per ball
-            if (!ball.userData.dir) {
-                0.01 * systemIntensity
-
-                ball.userData.dir = new THREE.Vector3(
-                    Math.random() - 0.5,
-                    Math.random() - 0.5,
-                    Math.random() - 0.5
-                ).normalize();
-            }
 
             let dir = ball.userData.dir;
             let base = ball.userData.base;
@@ -266,8 +248,6 @@ function animate() {
 
         line.geometry.attributes.position.needsUpdate = true;
     }
-
-
 
     /* =====================
        RENDER SCENE
@@ -328,7 +308,7 @@ window.addEventListener("pointerdown", function (event) {
         } else {
             humanGlowing = true;
             electricMode = true;
-            systemIntensity += 0.5;
+            systemIntensity = Math.min(systemIntensity + 1.5, 2);
 
 
         }
