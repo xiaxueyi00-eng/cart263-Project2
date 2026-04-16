@@ -17,15 +17,21 @@ starCanvas.style.zIndex = "-1";
 
 let stars = [];
 
-for (let i = 0; i < 200; i++) {
-    let star = {
-        x: Math.random() * starCanvas.width,
-        y: Math.random() * starCanvas.height,
-        r: Math.random() * 2
-    };
+function createStars() {
+    stars = [];
 
-    stars.push(star);
+    for (let i = 0; i < 200; i++) {
+        let star = {
+            x: Math.random() * starCanvas.width,
+            y: Math.random() * starCanvas.height,
+            r: Math.random() * 2
+        };
+
+        stars.push(star);
+    }
 }
+
+createStars();
 
 function animateStars() {
 
@@ -102,7 +108,7 @@ scene.add(light);
 const loader = new GLTFLoader();
 
 let model = null;      // store loaded model
-let exploded = false;  // state: whether animation is triggered
+let moveToCorner = false;;  // state: move the earth to corner
 
 
 loader.load("image/earth.glb", (gltf) => {
@@ -120,6 +126,7 @@ loader.load("image/earth.glb", (gltf) => {
 
     model.userData.finalScale = finalScale;
     model.userData.growing = false;
+    model.userData.fullSize = false;
 });
 
 /* =========================
@@ -136,14 +143,25 @@ function animate() {
     if (model && model.userData.growing) {
         const target = model.userData.finalScale;
 
-        model.scale.x += (target - model.scale.x) * 0.06;
-        model.scale.y += (target - model.scale.y) * 0.06;
-        model.scale.z += (target - model.scale.z) * 0.06;
+        model.scale.x += (target - model.scale.x) * 0.03;
+        model.scale.y += (target - model.scale.y) * 0.03;
+        model.scale.z += (target - model.scale.z) * 0.03;
 
         if (Math.abs(target - model.scale.x) < 0.001) {
             model.scale.set(target, target, target);
             model.userData.growing = false;
+            model.userData.fullSize = true;
         }
+    }
+
+    if (model && moveToCorner) {
+        model.scale.x += (0.035 - model.scale.x) * 0.05;
+        model.scale.y += (0.035 - model.scale.y) * 0.05;
+        model.scale.z += (0.035 - model.scale.z) * 0.05;
+
+        model.position.x += (3 - model.position.x) * 0.05;
+        model.position.y += (-1.3 - model.position.y) * 0.05;
+        model.position.z += (0 - model.position.z) * 0.05;
     }
     controls.update();
 
@@ -159,5 +177,22 @@ window.addEventListener("click", function () {
 
     if (model.userData.growing === false) {
         model.userData.growing = true;
+        return;
+    }
+
+    if (model.userData.fullSize === true) {
+        moveToCorner = true;
+        return;
     }
 });
+
+window.addEventListener('resize', () => {
+    starCanvas.width = window.innerWidth;
+    starCanvas.height = window.innerHeight;
+
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+})
