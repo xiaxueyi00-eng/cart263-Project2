@@ -111,6 +111,8 @@ const loader = new GLTFLoader();
 let model = null;      // store loaded model
 let moveToCorner = false;  // state: move the earth to corner
 let textShown = false;
+let clickCount = 0;
+
 
 loader.load("image/earth.glb", (gltf) => {
     model = gltf.scene;
@@ -172,29 +174,28 @@ function animate() {
 animate();
 
 window.addEventListener("click", function () {
-    if (model == null) {
-        return;
-    }
+    if (model == null) return;
 
-    if (model.userData.fullSize === false && model.userData.growing === false) {
+    clickCount++;
+
+    if (clickCount === 1) {
         model.userData.growing = true;
-        return;
     }
 
-    if (model.userData.fullSize === true) {
+    else if (clickCount === 2) {
         moveToCorner = true;
 
-        if (textShown === false) {
-            finalText.innerHTML = "CONNECTION DOES NOT MEAN CLOSENESS";
+        if (!textShown) {
+            finalText.innerHTML = "CONNECTION DOES NOT MEAN CLOSENESS.";
             finalText.style.opacity = "1";
             textShown = true;
         }
-
-        return;
     }
 
+    else if (clickCount === 3) {
+        window.location.href = "../xueyi-xia/html/index.html";
+    }
 });
-
 window.addEventListener('resize', () => {
     starCanvas.width = window.innerWidth;
     starCanvas.height = window.innerHeight;
