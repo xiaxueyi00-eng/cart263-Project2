@@ -209,7 +209,7 @@ window.addEventListener("click", function () {
 
         //only show text once
         if (!textShown) {
-            finalText.innerHTML = "CONNECTION DOES NOT MEAN CLOSENESS.";
+            finalText.innerHTML = "TO UPLOAD IS TO EXPOSE";
             finalText.style.opacity = "1";
             textShown = true;
         }

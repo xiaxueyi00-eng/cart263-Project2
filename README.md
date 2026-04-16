@@ -34,11 +34,12 @@ Project Overview
 
 5. Page Five: UPLOAD
 - This page is the game page. The player moves through a surveillance space, collects and deletes traces, leaves decoys behind, avoids robots, and tries to reach the upload gate before being fully tracked. One robot actively hunts fake files, which turns decoys into a tactical mechanic rather than a purely visual effect. This page uses Phaser.js for movement, collision, enemy behavior, countdown timing, and branching endings.
+- Use the arrow keys to move.
 ![upload](image/upload.png)
 
 6. Page Six: WORLD
-World is the final page. A small Earth appears in a dark space. As the user clicks, it grows and moves to the corner, revealing a message. This page is not about connection, but about exposure. It shows that uploading a thought is never neutral. Every action becomes data.In the process of uploading, the user is also uploading their personal information.This page uses Three.js for the 3D Earth and animation.
-![world](image/upload.png)
+- This is the final page. A small Earth appears in a dark space. As the user clicks, it grows and moves to the corner, revealing a message. This page is not about connection, but about exposure. It shows that uploading a thought is never neutral. Every action becomes data.In the process of uploading, the user is also uploading their personal information.This page uses Three.js for the 3D Earth and animation.
+![world](image/world.png)
 
 # References:
 
@@ -52,4 +53,17 @@ https://shoshanazuboff.com/book/
 Gillespie, T. (2014). 
 The relevance of algorithms. In T. Gillespie, P. J. Boczkowski, & K. A. Foot (Eds.), Media technologies: Essays on communication, materiality, and society (pp. 167–193). MIT Press.
  https://doi.org/10.7551/mitpress/9780262525374.003.0009
+
+Blast Theory. Can You See Me Now? (2003) 
+https://www.blasttheory.co.uk/projects/can-you-see-me-now/、
+
+Please Empty Your Pockets (2010)
+https://www.lozano-hemmer.com/please_empty_your_pockets.php
+
+Character Templates Pack
+https://erisesra.itch.io/character-templates-pack
+
+16x16+ Robot Tileset
+https://0x72.itch.io/16x16-robot-tileset
+
 
