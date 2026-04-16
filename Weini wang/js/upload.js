@@ -182,7 +182,7 @@ function create() {
     thoughtBox = this.add.rectangle(400, 300, 420, 120, 0x000000);
     thoughtBox.setStrokeStyle(1, 0xffffff);
     thoughtBox.setVisible(false);
-    thoughtBox.setDepth(1000);
+    thoughtBox.setDepth(2000);
 
     thoughtText = this.add.text(400, 300, "", {
         fontSize: "14px",
@@ -193,7 +193,7 @@ function create() {
     }).setOrigin(0.5);
 
     thoughtText.setVisible(false);
-    thoughtText.setDepth(1001);
+    thoughtText.setDepth(2001);
 
     endingTitle = this.add.text(400, 260, "", {
         fontSize: "30px",
@@ -345,6 +345,7 @@ function create() {
     startBox = this.add.rectangle(400, 300, 460, 260, 0x000000);
     startBox.setStrokeStyle(2, 0x727272);
     startBox.setDepth(3001);
+    startBox.setInteractive({ useHandCursor: true });
 
     startTitle = this.add.text(400, 210, "UPLOAD PROTOCOL", {
         fontSize: "26px",
@@ -379,6 +380,16 @@ function create() {
     }).setOrigin(0.5);
 
     startHint.setDepth(3002);
+
+    startBox.on("pointerdown", () => {
+        gameStarted = true;
+
+        startOverlay.setVisible(false);
+        startBox.setVisible(false);
+        startTitle.setVisible(false);
+        startInstruction.setVisible(false);
+        startHint.setVisible(false);
+    });
 }
 
 function update() {
