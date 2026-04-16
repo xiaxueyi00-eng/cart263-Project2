@@ -23,7 +23,6 @@ title.style.transform = "translate(-50%, -50%)";
 // Typography styling
 title.style.color = "white";
 title.style.fontSize = "40px";
-title.style.fontFamily = "Helvetica, Arial, sans-serif";
 title.style.fontWeight = "100";
 title.style.letterSpacing = "8px";
 title.style.textTransform = "uppercase";
