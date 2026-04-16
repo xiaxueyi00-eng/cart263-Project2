@@ -1,19 +1,62 @@
-body {
-    margin: 0;
-    overflow: hidden;
-}
+ .space-mono-regular {
+     font-family: "Space Mono", monospace;
+     font-weight: 400;
+     font-style: normal;
+ }
 
-/* stars background */
-#stars {
-    position: fixed;
-    inset: 0;
-    z-index: 0;
-    pointer-events: none;
-}
+ .space-mono-bold {
+     font-family: "Space Mono", monospace;
+     font-weight: 700;
+     font-style: normal;
+ }
 
-/* three.js canvas */
-#three {
-    position: fixed;
-    inset: 0;
-    z-index: 1;
-}
+ .space-mono-regular-italic {
+     font-family: "Space Mono", monospace;
+     font-weight: 400;
+     font-style: italic;
+ }
+
+ .space-mono-bold-italic {
+     font-family: "Space Mono", monospace;
+     font-weight: 700;
+     font-style: italic;
+ }
+
+ body {
+     margin: 0;
+     overflow: hidden;
+ }
+
+ /* stars background */
+ #stars {
+     position: fixed;
+     inset: 0;
+     z-index: 0;
+     pointer-events: none;
+ }
+
+ /* three.js canvas */
+ #three {
+     position: fixed;
+     inset: 0;
+     z-index: 1;
+ }
+
+ #finalText {
+     position: fixed;
+     top: 50%;
+     left: 50%;
+     transform: translate(-50%, -50%);
+     color: white;
+     font-family: "Space Mono", monospace;
+     font-size: 30px;
+     font-weight: bold;
+     text-transform: uppercase;
+     text-align: center;
+     line-height: 1.6;
+     letter-spacing: 2px;
+     opacity: 0;
+     transition: opacity 2s ease;
+     z-index: 10;
+     pointer-events: none;
+ }

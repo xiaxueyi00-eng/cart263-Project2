@@ -60,6 +60,7 @@ function animateStars() {
 
 animateStars();
 
+const finalText = document.querySelector("#finalText");
 /* =========================
    THREE.JS BASIC SCENE SETUP
 ========================= */
@@ -108,8 +109,8 @@ scene.add(light);
 const loader = new GLTFLoader();
 
 let model = null;      // store loaded model
-let moveToCorner = false;;  // state: move the earth to corner
-
+let moveToCorner = false;  // state: move the earth to corner
+let textShown = false;
 
 loader.load("image/earth.glb", (gltf) => {
     model = gltf.scene;
@@ -175,24 +176,31 @@ window.addEventListener("click", function () {
         return;
     }
 
-    if (model.userData.growing === false) {
+    if (model.userData.fullSize === false && model.userData.growing === false) {
         model.userData.growing = true;
         return;
     }
 
     if (model.userData.fullSize === true) {
         moveToCorner = true;
+
+        if (textShown === false) {
+            finalText.innerHTML = "CONNECTION DOES NOT MEAN CLOSENESS";
+            finalText.style.opacity = "1";
+            textShown = true;
+        }
+
         return;
     }
+
 });
 
 window.addEventListener('resize', () => {
     starCanvas.width = window.innerWidth;
     starCanvas.height = window.innerHeight;
-
+    createStars();
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
-
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 })
