@@ -57,6 +57,13 @@ let endingText;
 let endingTitle;
 let nextPage = "world.html";
 
+let gameStarted = false;
+let startOverlay;
+let startBox;
+let startTitle;
+let startInstruction;
+let startHint;
+
 function preload() {
     this.load.spritesheet("player", "image/16x32 Walk1.png", {
         frameWidth: 16,
@@ -334,6 +341,11 @@ function create() {
 }
 
 function update() {
+    if (!gameStarted) {
+        player.setVelocity(0);
+        return;
+    }
+
     if (gameEnded) {
         player.setVelocity(0);
         return;
