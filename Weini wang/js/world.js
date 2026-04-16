@@ -217,7 +217,7 @@ window.addEventListener("click", function () {
 
     //click 3, back to homepage
     else if (clickCount === 3) {
-        window.location.href = "../Xueyi-Xia/html/index.html";
+        window.location.href = "/cart263-Project2/Xueyi-Xia/html/index.html";
     }
 });
 
