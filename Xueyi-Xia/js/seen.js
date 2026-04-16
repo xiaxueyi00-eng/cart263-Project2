@@ -306,7 +306,7 @@ function animate() {
 
                     STATE = "WIN";
 
-                    window.location.href = "next.html";
+                    window.location.href = "submit.html";
                 }
             }
 
