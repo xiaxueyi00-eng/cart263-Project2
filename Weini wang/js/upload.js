@@ -63,6 +63,7 @@ let endingBox;
 let endingText;
 let endingTitle;
 let nextPage = "world.html";
+let countdownEvent;
 
 let gameStarted = false;
 let startOverlay;
@@ -340,57 +341,6 @@ function create() {
         playerInvincible = false;
     });
 
-    //countdown event runs every second
-    this.time.addEvent({
-        //run every 1 second
-        delay: 1000,
-        // repeat 30 times total
-        repeat: 29,
-        callback: () => {
-            //stop if not active
-            if (!gameStarted || doorOpen || gameEnded) return;
-
-            // reduce time by 1
-            timeLeft--;
-            //update timer text
-            timerText.setText("Uploading In 0:" + timeLeft);
-
-            //when timer reaches 0
-            if (timeLeft <= 0) {
-                doorOpen = true;
-
-                //remove robots and files
-                robots.clear(true, true);
-                files.clear(true, true);
-                fakeFiles.clear(true, true);
-
-                //show the exit Door
-                exitDoor.setVisible(true);
-                exitDoor.body.enable = true;
-                exitDoor.anims.play("doorOpen", true);
-
-                //exit message
-                exitText = this.add.text(400, 530, "UPLOAD GATE OPEN", {
-                    fontSize: "12px",
-                    color: "#00f13c",
-                    fontFamily: "'Space Mono'"
-                }).setOrigin(0.5);
-
-                //make exit text blink
-                this.tweens.add({
-                    targets: exitText,
-                    alpha: 0,
-                    duration: 1000,
-                    yoyo: true,
-                    repeat: 1000
-                });
-
-                //keep text on top
-                exitText.setDepth(1001);
-            }
-        }
-    });
-
     //player touches robot
     this.physics.add.overlap(player, robots, hitRobot, null, this);
 
@@ -467,6 +417,57 @@ function create() {
         startTitle.setVisible(false);
         startInstruction.setVisible(false);
         startHint.setVisible(false);
+
+        //countdown event runs every second
+        this.time.addEvent({
+            //run every 1 second
+            delay: 1000,
+            // repeat 30 times total
+            repeat: 29,
+            callback: () => {
+                //stop if not active
+                if (!gameStarted || doorOpen || gameEnded) return;
+
+                // reduce time by 1
+                timeLeft--;
+                //update timer text
+                timerText.setText("Uploading In 0:" + timeLeft);
+
+                //when timer reaches 0
+                if (timeLeft <= 0) {
+                    doorOpen = true;
+
+                    //remove robots and files
+                    robots.clear(true, true);
+                    files.clear(true, true);
+                    fakeFiles.clear(true, true);
+
+                    //show the exit Door
+                    exitDoor.setVisible(true);
+                    exitDoor.body.enable = true;
+                    exitDoor.anims.play("doorOpen", true);
+
+                    //exit message
+                    exitText = this.add.text(400, 530, "UPLOAD GATE OPEN", {
+                        fontSize: "12px",
+                        color: "#00f13c",
+                        fontFamily: "'Space Mono'"
+                    }).setOrigin(0.5);
+
+                    //make exit text blink
+                    this.tweens.add({
+                        targets: exitText,
+                        alpha: 0,
+                        duration: 1000,
+                        yoyo: true,
+                        repeat: 1000
+                    });
+
+                    //keep text on top
+                    exitText.setDepth(1001);
+                }
+            }
+        });
     });
 }
 

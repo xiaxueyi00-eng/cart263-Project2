@@ -1,13 +1,13 @@
 # CART-263-PROJECT-II
 Cart 263 project II
 - Team work : Xueyi Xia, Weini Wang
-- github live link：https://github.com/xiaxueyi00-eng/cart263-Project2
-- github repositories link：https://xiaxueyi00-eng.github.io/cart263-Project2/Xueyi-Xia/html/index.html
+- github live link：https://xiaxueyi00-eng.github.io/cart263-Project2/Xueyi-Xia/html/index.html 
+- github repositories link：https://github.com/xiaxueyi00-eng/cart263-Project2
 
 # Interactive Web Project
 Project Overview
 - This project discusses the digital network paradox: the internet is usually understood as a tool to connect and share space, but at the same time, it is also a system of continuous data collection, control and the constructs of visibility.
-- Based on the foundation of Project I, this project continues the original conceptual framework, and further expands the mode for expression through a more spatial and interactive web structure. The project's core structure does not change, but by adding a more comolex interactive mechanism and partial three-dimensional representation, the network system becomes more audiovisual and immersive.
+- Based on the foundation of Project I, this project continues the original conceptual framework, and further expands the mode for expression through a more spatial and interactive web structure. The project's core structure does not change, but by adding a more complex interactive mechanism and partial three-dimensional representation, the network system becomes more audiovisual and immersive.
 # Structure of the Project
 - The project consists of six interconnected webpages:
 
@@ -28,7 +28,17 @@ Project Overview
 
 # Weini Wang Part :
 
+4. Page Four: SUMBIT
+- This page is the entry page. It presents a 3D network made of a central sphere, surrounding nodes, connecting lines, and moving data flows. The user can hover over a node, click it, and type a shared thought. After pressing Enter, the selected node is absorbed into the center, suggesting that personal input becomes part of a larger system. This page uses Three.js for 3D geometry, raycasting, particle animation, and interaction.
+![submit](image/submit.png)
 
+5. Page Five: UPLOAD
+- This page is the game page. The player moves through a surveillance space, collects and deletes traces, leaves decoys behind, avoids robots, and tries to reach the upload gate before being fully tracked. One robot actively hunts fake files, which turns decoys into a tactical mechanic rather than a purely visual effect. This page uses Phaser.js for movement, collision, enemy behavior, countdown timing, and branching endings.
+![upload](image/upload.png)
+
+6. Page Six: WORLD
+World is the final page. A small Earth appears in a dark space. As the user clicks, it grows and moves to the corner, revealing a message. This page is not about connection, but about exposure. It shows that uploading a thought is never neutral. Every action becomes data.In the process of uploading, the user is also uploading their personal information.This page uses Three.js for the 3D Earth and animation.
+![world](image/upload.png)
 
 # References:
 
