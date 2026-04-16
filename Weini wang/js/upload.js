@@ -294,7 +294,7 @@ function create() {
         delay: 1000,
         repeat: 29,
         callback: () => {
-            if (doorOpen || gameEnded) return;
+            if (!gameStarted || doorOpen || gameEnded) return;
 
             timeLeft--;
             timerText.setText("Uploading In 0:" + timeLeft);
@@ -338,6 +338,9 @@ function create() {
             window.location.href = nextPage;
         }
     });
+
+    startOverlay = this.add.rectangle(400, 300, 800, 600, 0x000000, 0.7);
+    startOverlay.setDepth(3000);
 }
 
 function update() {
