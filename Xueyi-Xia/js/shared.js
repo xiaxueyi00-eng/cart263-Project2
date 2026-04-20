@@ -129,7 +129,11 @@ loader.load("../image/ball.glb", (gltf) => {
         b.userData.base = b.position.clone();
         // Random phase offset for movement variation
         b.userData.offset = Math.random() * 100;
-
+        b.userData.dir = new THREE.Vector3(
+            (Math.random() - 0.5),
+            (Math.random() - 0.5),
+            (Math.random() - 0.5)
+        ).normalize();
         scene.add(b);
         balls.push(b);
 
@@ -206,7 +210,7 @@ function animate() {
             );
 
             // Orbital movement around center model
-            ball.position.x = centerX + dir.x * radius;
+            ball.position.x = centerModel.position.x + dir.x * radius;
             ball.position.y = base.y + Math.cos(t * 1.2 + i) * 0.3;
             ball.position.z = base.z + Math.sin(t * 0.8 + i) * 0.3;
         }
