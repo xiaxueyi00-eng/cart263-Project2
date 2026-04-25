@@ -306,7 +306,7 @@ function animate() {
 
                     STATE = "WIN";
 
-                    window.location.href = "../../Weini-wang/js/submit.html";
+                    window.location.href = "../../Weini-wang/submit.html";
                 }
             }
 
